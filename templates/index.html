@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{%block head_title%}Index - {%endblock%}
+{% block body %}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                COSCUP 行政組
+            </h1>
+            <h2 class="subtitle">
+                Secretary Services
+            </h2>
+        </div>
+    </div>
+</section>
+{% if session.get('u') %}
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <div class="content">
+                    <h3>結束服務</h3>
+                </div>
+                <div class="buttons">
+                    <a class="button is-outlined is-warning is-light" href="/logout">
+                        <span class="icon"><i class="fas fa-power-off"></i></span>
+                        <span>登出</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-three-fifths is-offset-one-fifth">
+                <div class="content">
+                    <h3>歡迎使用服務</h3>
+                </div>
+                <div class="buttons">
+                    <a class="button is-fullwidth is-outlined is-info is-light" href="/oauth2callback">
+                        <span class="icon"><i class="fas fa-sign-in-alt"></i></span> <span>登入</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

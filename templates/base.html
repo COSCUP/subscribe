@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="/css/bulma.min.090.css" rel="stylesheet">
+    <link href="/faw/css/all.min.css" rel="stylesheet">
+    <title>{%block head_title%}{%endblock%}COSCUP Secretary</title>
+    <style>
+        [v-cloak] { display: none; }
+        html { font-size: 14px; }
+    </style>
+  </head>
+  <body>
+  <nav class="navbar is-info" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a class="button is-info is-light is-family-monospace has-text-weight-bold" href="/">COSCUP 行政組</a>
+      </div>
+
+      <a role="button" class="navbar-burger" v-on:click="navtoggle = !navtoggle" v-bind:class="{'is-active': navtoggle}" data-target="navMenu" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu" id="navMenu" v-bind:class="{'is-active': navtoggle}">
+      <div class="navbar-end">
+          {% if session.get('u') %}
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">
+                <span style="margin-right: 5px;">
+                    <figure class="image is-24x24">
+                        <img class="is-rounded" src="{{session.u.picture}}">
+                    </figure>
+                </span>
+                <span>{{session.u.name}}</span>
+            </a>
+            <div class="navbar-dropdown is-right">
+                <a class="navbar-item" href="/logout">
+                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span> <span>登出</span>
+                </a>
+            </div>
+          </div>
+          {% else %}
+          <div class="navbar-item">
+              <div class="field is-grouped">
+                  <p class="control">
+                  <a class="button is-info is-light" href="/oauth2callback"
+                         v-on:click="in_login = true" v-bind:class="{'is-loading': in_login}">
+                      <span class="icon"><i class="fas fa-sign-in-alt"></i></span> <span>登入</span></a>
+                  </p>
+              </div>
+          </div>
+          {% endif %}
+      </div>
+    </div>
+  </nav>
+  {% block body %}{% endblock %}
+  <footer class="footer" style="margin-top: 50px;">
+    <div class="content has-text-centered">
+      <p>COSCUP 行政組</p>
+    </div>
+  </footer>
+  <script src="/js/vue.min.js"></script>
+  <script>
+      (function() {
+          let app = new Vue({
+              el: 'nav',
+              data: {
+                  navtoggle: false,
+                  in_login: false
+              },
+              delimiters: ['[[', ']]']
+          });
+      })();
+  </script>
+  {% block js %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,9 @@
+.git
+.gitignore
+.ycm_extra_conf.py
+__pycache__
+log
+log_docker_celery
+scripts
+venv
+working.py

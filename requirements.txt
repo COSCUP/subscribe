@@ -1,0 +1,15 @@
+google-api-python-client
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+
+arrow
+blinker
+boto3
+celery<5
+flask
+markdown
+phonenumbers
+pylibmc
+pymongo
+requests
