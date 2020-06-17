@@ -5,7 +5,27 @@ from models.subscriberdb import SubscriberDB
 
 
 class Subscriber(object):
-    '''Subscriber class'''
+    '''Subscriber class
+
+    :param str mail: get subscriber data from mail
+
+    '''
+    def __init__(self, mail):
+        mail = self.format_mail(mail)
+        self.data = SubscriberDB().find_one({'_id': mail})
+
+    def render_admin_code(self):
+        ''' render admin code for link '''
+        return self.shadata('%(code)s|%(_id)s' % self.data)
+
+    def verify_admin_code(self, code):
+        ''' verify admin code
+
+        :param str code: code
+
+        '''
+        return code == self.render_admin_code()
+
     @classmethod
     def process_upload(cls, mail, name):
         '''process upload
@@ -53,10 +73,8 @@ class Subscriber(object):
         return mail
 
     @staticmethod
-    def shamail(mail):
-        mail = format_mail(mail)
-
+    def shadata(data):
         m = hashlib.sha256()
-        m.update(mail.encode('utf8'))
+        m.update(data.encode('utf8'))
 
         return m.hexdigest()
