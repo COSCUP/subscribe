@@ -25,6 +25,7 @@ from flask import session
 from flask import url_for
 
 import setting
+from celery_task.task_mail_sys import mail_sys_weberror
 from view.admin_subscriber import VIEW_ADMIN_SUBSCRIBER
 from view.subscriber import VIEW_SUBSCRIBER
 
@@ -40,6 +41,7 @@ NO_NEED_LOGIN_PATH = (
     '/',
     '/oauth2callback',
     '/logout',
+    '/exception',
 )
 
 @app.before_request
@@ -139,6 +141,20 @@ def exception():
         1/0
     except Exception as e:
         raise Exception('Error: [%s]' % e)
+
+def error_exception(sender, exception, **extra):
+    mail_sys_weberror.apply_async(
+        kwargs={
+            'title': u'%s %s %s' % (request.method, request.path, arrow.now()),
+            'body': '''<b>%s</b> %s<br>
+            <pre>%s</pre>
+            <pre>%s</pre>
+            <pre>User: %s\n\nsid: %s\n\nargs: %s\n\nform: %s\n\nvalues: %s\n\n%s</pre>''' %
+            (request.method, request.path, os.environ, request.headers,
+             g.get('user', {}).get('account', {}).get('_id'), session.get('sid'), request.args, request.form, request.values, traceback.format_exc())
+        })
+
+got_request_exception.connect(error_exception, app)
 
 if __name__ == '__main__':
     app.run(debug=False, host=setting.SERVER_HOST, port=setting.SERVER_PORT)

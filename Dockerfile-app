@@ -1,6 +1,7 @@
 FROM secretary-base:20.06.16
 
 ADD ./client_secret.json ./client_secret.json
+ADD ./celery_task ./celery_task
 ADD ./main.py ./main.py
 ADD ./models ./models
 ADD ./module ./module
