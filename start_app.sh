@@ -1,5 +1,6 @@
 docker run -d --restart='always' \
            --name secretary-1 \
+           --link secretary_mongo:mongo \
            --log-opt max-size=64m \
            --log-opt max-file=1 \
            -v $(pwd)/log:/app/log \

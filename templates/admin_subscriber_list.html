@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{%block head_title%}Subscriber List - {%endblock%}
+{% block body %}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                訂閱名單
+            </h1>
+            <h2 class="subtitle">
+                Subscriber List
+            </h2>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container" id="subscribelist" v-cloak>
+        <div class="columns">
+            <div class="column">
+                <div class="content">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>index</th>
+                                <th>code</th>
+                                <th>uni mail</th>
+                                <th>name</th>
+                                <th>mail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(data, index) in datas">
+                                <td>[[ index+1 ]].</td>
+                                <td>[[ data.code ]]</td>
+                                <td>[[ data._id ]]</td>
+                                <td>[[ data.name ]]</td>
+                                <td>[[ data.mails ]]</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block js %}
+<script src="/js/axios.min.js"></script>
+<script>
+    (function() {
+        let $subscribelist = new Vue({
+            el: '#subscribelist',
+            data: {
+                datas: []
+            },
+            mounted: function() {
+                this.load();
+            },
+            methods: {
+                load: function() {
+                    axios.post('./list', {casename: 'get'}).then(function(resp) {
+                        resp.data.datas.sort(function(a, b) {
+                            if (a._id > b._id) {
+                                return 1;
+                            }
+                            if (a._id < b._id) {
+                                return -1;
+                            }
+                            return 0;
+                        });
+                        $subscribelist.datas = resp.data.datas;
+                    });
+                },
+            },
+            delimiters: ['[[', ']]']
+        });
+    })();
+</script>
+{% endblock %}

@@ -23,12 +23,14 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
+from view.admin_subscriber import VIEW_ADMIN_SUBSCRIBER
 
 import setting
 
 app = Flask(__name__)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = setting.SECRET_KEY
+app.register_blueprint(VIEW_ADMIN_SUBSCRIBER)
 
 
 NO_NEED_LOGIN_PATH = (
