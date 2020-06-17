@@ -30,10 +30,15 @@ class SubscriberLoginTokenDB(DBBase):
         ''' index '''
         self.create_index([('created_at', -1), ])
 
-    def default(token, uni_mail):
-        ''' default data '''
+    def default(token, uni_mail, _type):
+        ''' default data
+
+        :param str _type: code, token
+
+        '''
         return {
             '_id': token,
             'uni_mail': uni_mail,
+            '_type': _type,
             'created_at': datetime.now(),
         }

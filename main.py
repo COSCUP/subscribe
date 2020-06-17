@@ -23,14 +23,17 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
-from view.admin_subscriber import VIEW_ADMIN_SUBSCRIBER
 
 import setting
+from view.admin_subscriber import VIEW_ADMIN_SUBSCRIBER
+from view.subscriber import VIEW_SUBSCRIBER
+
 
 app = Flask(__name__)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = setting.SECRET_KEY
 app.register_blueprint(VIEW_ADMIN_SUBSCRIBER)
+app.register_blueprint(VIEW_SUBSCRIBER)
 
 
 NO_NEED_LOGIN_PATH = (
@@ -48,10 +51,10 @@ def need_login():
             session, )
        )
 
-    if request.path not in NO_NEED_LOGIN_PATH:
+    if request.path not in NO_NEED_LOGIN_PATH and not request.path.startswith('/subscriber'):
         if not session.get('u'):
             session['r'] = request.path
-            return redirect(url_for('oauth2logout'))
+            return redirect(url_for('oauth2logout', _scheme='https', _external=True))
 
 
 @app.after_request

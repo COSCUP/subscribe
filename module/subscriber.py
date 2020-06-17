@@ -32,24 +32,42 @@ class Subscriber(object):
         '''
         return code == self.render_admin_code()
 
-    def make_login_code(self):
-        ''' make an login code '''
+    def make_login(self, _type):
+        ''' make an login code
+
+        :param str _type: code, token
+
+        '''
+        if _type not in ('code', 'token'):
+            raise Exception('type error')
+
         token = self.shadata(str(uuid4()) + str(uuid4()))
+
         data = SubscriberLoginTokenDB.default(
-                token=token, uni_mail=self.data['_id'])
+                token=token, uni_mail=self.data['_id'], _type=_type)
 
         return SubscriberLoginTokenDB().insert_one(data).inserted_id
 
-    def verify_login_code(self, code):
-        ''' verify login code '''
-        before = datetime.fromtimestamp(time() - 3600)
+    @classmethod
+    def verify_login(cls, _type, code):
+        ''' verify login code
+
+        :param str _type: code, token
+
+        '''
+        if _type == 'code':
+            before = datetime.fromtimestamp(time() - 600)
+
+        elif _type == 'token':
+            before = datetime.fromtimestamp(time() - 3600)
+
         login_token = SubscriberLoginTokenDB().find_one(
-            {'_id': code, 'created_at': {'$gte': before}})
+                {'_id': code, '_type': _type, 'created_at': {'$gte': before}})
 
         if not login_token:
             return False
 
-        return login_token['uni_mail'] == self.data['_id']
+        return cls(mail=login_token['uni_mail'])
 
     @classmethod
     def process_upload(cls, mail, name):
