@@ -5,7 +5,7 @@ from models.base import DBBase
 
 
 class SubscriberDB(DBBase):
-    '''SubscriberDB class'''
+    ''' SubscriberDB collection '''
     def __init__(self):
         super(SubscriberDB, self).__init__('subscriber')
 
@@ -17,5 +17,23 @@ class SubscriberDB(DBBase):
             'name': name,
             'mails': mails,
             'code': '%0.8x' % uuid4().fields[0],
+            'created_at': datetime.now(),
+        }
+
+
+class SubscriberLoginTokenDB(DBBase):
+    ''' SubscriberLoginTokenDB collection '''
+    def __init__(self):
+        super(SubscriberLoginTokenDB, self).__init__('subscriber_login_token')
+
+    def index(self):
+        ''' index '''
+        self.create_index([('created_at', -1), ])
+
+    def default(token, uni_mail):
+        ''' default data '''
+        return {
+            '_id': token,
+            'uni_mail': uni_mail,
             'created_at': datetime.now(),
         }

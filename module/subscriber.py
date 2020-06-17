@@ -1,7 +1,13 @@
 import hashlib
 import re
+from datetime import datetime
+from time import time
+from uuid import uuid4
+
+from pymongo.collection import ReturnDocument
 
 from models.subscriberdb import SubscriberDB
+from models.subscriberdb import SubscriberLoginTokenDB
 
 
 class Subscriber(object):
@@ -25,6 +31,25 @@ class Subscriber(object):
 
         '''
         return code == self.render_admin_code()
+
+    def make_login_code(self):
+        ''' make an login code '''
+        token = self.shadata(str(uuid4()) + str(uuid4()))
+        data = SubscriberLoginTokenDB.default(
+                token=token, uni_mail=self.data['_id'])
+
+        return SubscriberLoginTokenDB().insert_one(data).inserted_id
+
+    def verify_login_code(self, code):
+        ''' verify login code '''
+        before = datetime.fromtimestamp(time() - 3600)
+        login_token = SubscriberLoginTokenDB().find_one(
+            {'_id': code, 'created_at': {'$gte': before}})
+
+        if not login_token:
+            return False
+
+        return login_token['uni_mail'] == self.data['_id']
 
     @classmethod
     def process_upload(cls, mail, name):
