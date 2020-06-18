@@ -57,7 +57,6 @@
             },
             methods: {
                 load: function() {
-                    console.info(this);
                     let btn = this.$el.querySelector('button');
                     btn.classList.add('is-loading');
                     axios.post('./list', {casename: 'get'}).then(function(resp) {

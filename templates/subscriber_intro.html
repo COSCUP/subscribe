@@ -1,0 +1,127 @@
+{% extends 'base_subscribe.html' %}
+{%block head_title%}Manage Subscription - {%endblock%}
+{% block body %}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                管理電子報訂閱
+            </h1>
+            <h2 class="subtitle">
+                Manage Subscription 
+            </h2>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="columns" id="subscriberintro" v-cloak>
+            <div class="column is-half is-offset-one-quarter">
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" v-model="data.name">
+                    </div>
+                    <p class="help is-info">收件人的稱呼。</p>
+                </div>
+                <div class="field">
+                    <label class="label">Mails</label>
+                    <div class="control">
+                        <div class="tags">
+                            <span class="tag is-success is-light" v-for="mail in data.mails">[[ mail ]]</span>
+                        </div>
+                    </div>
+                    <p class="help is-info">所登記的信箱，會使用最後一個來發送。</p>
+                </div>
+                <div class="field">
+                    <label class="label has-text-danger-dark">Unsubscribe 取消訂閱</label>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" v-model="data.unsubscribe">
+                            取消訂閱、移除訂閱清單！
+                        </label>
+                    </div>
+                    <p class="help is-danger">再也不收 COSCUP 的訊息。</p>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link is-outlined" v-on:click="send">
+                            <span class="icon"><i class="far fa-check-circle"></i></span>
+                            <span>Update</span>
+                        </button>
+                    </div>
+                    <div class="control">
+                        <a href='./clean' class="button is-outlined">
+                            <span class="icon"><i class="fas fa-power-off"></i></span>
+                            <span>結束本次登入管理</span>
+                            <span class="icon"><i class="fas fa-hourglass-half"></i></span>
+                            <span>([[ expired ]])</span>
+                        </a>
+                    </div>
+                </div>
+                <pre>[[ data ]]</pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block js %}
+<script src="/js/axios.min.js"></script>
+<script>
+    (function() {
+        let $subscriberintro = new Vue({
+            el: '#subscriberintro',
+            data: {
+                data: {},
+                expired: '00m00s',
+                interval: {}
+            },
+            mounted: function() {
+                this.load();
+            },
+            methods: {
+                load: function() {
+                    this.lock();
+                    axios.post('./intro', {casename: 'get'}).then(function(resp) {
+                        $subscriberintro.data = resp.data.data;
+                        $subscriberintro.countdown();
+                        $subscriberintro.interval = window.setInterval($subscriberintro.countdown, 1000);
+                        $subscriberintro.unlock();
+                    });
+                },
+                send: function() {
+                    this.lock();
+                    axios.post('./intro', {casename: 'update', data: this.data}).then(function(resp) {
+                        $subscriberintro.unlock();
+                    });
+                },
+                lock: function() {
+                    this.$el.querySelectorAll('button').forEach(function(btn){
+                        btn.classList.add('is-loading');
+                    });
+                },
+                unlock: function() {
+                    this.$el.querySelectorAll('button').forEach(function(btn){
+                        btn.classList.remove('is-loading');
+                    });
+                },
+                countdown: function() {
+                    let cd = new Date(this.data.login_since).getTime() / 1000;
+                    let now = new Date().getTime() / 1000;
+                    let distance = 3600 - (now-cd);
+                    let minutes = Math.floor((distance % (60 * 60)) / (60));
+                    let seconds = Math.floor(distance % (60));
+
+                    this.expired = minutes+'m'+seconds+'s';
+
+                    if (distance < 0) {
+                        window.clearInterval(this.interval);
+                        window.location.href = './intro';
+                    }
+                }
+            },
+            delimiters: ['[[', ']]']
+        });
+    })();
+</script>
+{% endblock %}

@@ -11,6 +11,10 @@ from module.subscriber import Subscriber
 
 VIEW_SUBSCRIBER = Blueprint('subscriber', __name__, url_prefix='/subscriber')
 
+@VIEW_SUBSCRIBER.route('/infomsg')
+def info_msg():
+    return render_template('./subscriber_error.html',
+            show_info=session.get('show_info', [])), session.get('status_code', 401)
 
 @VIEW_SUBSCRIBER.route('/code/<code>', methods=('GET', 'POST'))
 def code_page(code):
@@ -20,20 +24,29 @@ def code_page(code):
     elif request.method == 'POST':
         s = Subscriber(mail=request.form['mail'])
         if not s.data:
-            return render_template('./subscriber_error.html', show_info=('001', )), 404
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         if s.verify_admin_code(code):
             mail_login_code.apply_async(kwargs={'mail': s.data['_id']})
-            return render_template('./subscriber_error.html', show_info=('002', ))
 
-        return render_template('./subscriber_error.html', show_info=('001', )), 404
+            session['show_info'] = ('002', )
+            session['status_code'] = 200
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        session['show_info'] = ('001', )
+        session['status_code'] = 404
+        return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
 @VIEW_SUBSCRIBER.route('/token/<code>')
 def token(code):
     if request.method == 'GET':
         s = Subscriber.verify_login(_type='code', code=code)
-        if not s.data:
-            return u'', 404
+        if not s or not s.data:
+            session['show_info'] = ('003', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         session['s_login_token'] = s.make_login('token')
 
@@ -43,11 +56,41 @@ def token(code):
 @VIEW_SUBSCRIBER.route('/intro', methods=('GET', 'POST'))
 def intro():
     if 's_login_token' not in session:
-        return u'', 401
+        session['show_info'] = ('003', )
+        session['status_code'] = 404
+        return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
     user = Subscriber.verify_login(_type='token', code=session['s_login_token'])
-    if not user.data:
-        return u'', 401
+    if not user or not user.data:
+        session['show_info'] = ('003', )
+        session['status_code'] = 404
+        return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
     if request.method == 'GET':
-        return u'hi intro %s, token: %s' % (user.data, session['s_login_token'])
+        return render_template('./subscriber_intro.html')
+
+    elif request.method == 'POST':
+        post_data = request.get_json()
+
+        if 'casename' not in post_data:
+            return jsonify({}), 401
+
+        if post_data['casename'] == 'get':
+            data = {
+                'name': user.data['name'],
+                'mails': user.data['mails'],
+                'login_since': user.login_token_data['created_at'],
+                'unsubscribe': False,
+            }
+            return jsonify({'data': data})
+
+        elif post_data['casename'] == 'update':
+            return jsonify({'data': post_data['data']})
+
+@VIEW_SUBSCRIBER.route('/clean', methods=('GET', 'POST'))
+def clean():
+    session.pop('s_login_token', None)
+
+    session['show_info'] = ('004', )
+    session['status_code'] = 200
+    return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))

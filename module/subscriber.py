@@ -19,6 +19,7 @@ class Subscriber(object):
     def __init__(self, mail):
         mail = self.format_mail(mail)
         self.data = SubscriberDB().find_one({'_id': mail})
+        self.login_token_data = {}
 
     def render_admin_code(self):
         ''' render admin code for link '''
@@ -67,7 +68,10 @@ class Subscriber(object):
         if not login_token:
             return False
 
-        return cls(mail=login_token['uni_mail'])
+        user = cls(mail=login_token['uni_mail'])
+        user.login_token_data = login_token
+
+        return user
 
     @classmethod
     def process_upload(cls, mail, name):

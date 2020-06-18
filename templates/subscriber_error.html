@@ -20,7 +20,10 @@
                 {% if '001' in show_info %}
                 <article class="message is-warning">
                     <div class="message-header">
-                        <p>訊息</p>
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
+                            <span>訊息</span>
+                        </p>
                     </div>
                     <div class="message-body">
                         使用錯誤的管理頁面連結。
@@ -30,10 +33,39 @@
                 {% if '002' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
-                        <p>登入連結</p>
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <span>登入連結</span>
+                        </p>
                     </div>
                     <div class="message-body">
                         已將登入連結寄送到信箱，請透過連結登入管理。
+                    </div>
+                </article>
+                {% endif %}
+                {% if '003' in show_info %}
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <span>登入失敗</span>
+                        </p>
+                    </div>
+                    <div class="message-body">
+                        登入憑證已過期，請重新取得登入憑證。
+                    </div>
+                </article>
+                {% endif %}
+                {% if '004' in show_info %}
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <span>已清除</span>
+                        </p>
+                    </div>
+                    <div class="message-body">
+                        已清除憑證，感謝使用。
                     </div>
                 </article>
                 {% endif %}
