@@ -15,31 +15,30 @@
 </section>
 <section class="section">
     <div class="container" id="subscribelist" v-cloak>
-        <div class="columns">
-            <div class="column">
-                <div class="content">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>index</th>
-                                <th>code</th>
-                                <th>uni mail</th>
-                                <th>name</th>
-                                <th>mail</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(data, index) in datas">
-                                <td>[[ index+1 ]].</td>
-                                <td>[[ data.code ]]</td>
-                                <td>[[ data._id ]]</td>
-                                <td>[[ data.name ]]</td>
-                                <td>[[ data.mails ]]</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <button class="button" v-on:click="load">共 [[ datas.length ]] 筆</button>
+        <div class="table-container" v-if="datas.length">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>index</th>
+                        <th>code</th>
+                        <th>uni mail</th>
+                        <th>name</th>
+                        <th>mail</th>
+                        <th>admin code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(data, index) in datas">
+                        <td>[[ index+1 ]].</td>
+                        <td>[[ data.code ]]</td>
+                        <td>[[ data._id ]]</td>
+                        <td>[[ data.name ]]</td>
+                        <td>[[ data.mails ]]</td>
+                        <td><a :href="'https://secretary.coscup.org/subscriber/code/'+ data.admin_code">[[ data.admin_code ]]</a></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </section>
@@ -58,6 +57,9 @@
             },
             methods: {
                 load: function() {
+                    console.info(this);
+                    let btn = this.$el.querySelector('button');
+                    btn.classList.add('is-loading');
                     axios.post('./list', {casename: 'get'}).then(function(resp) {
                         resp.data.datas.sort(function(a, b) {
                             if (a._id > b._id) {
@@ -69,6 +71,7 @@
                             return 0;
                         });
                         $subscribelist.datas = resp.data.datas;
+                        btn.classList.remove('is-loading');
                     });
                 },
             },

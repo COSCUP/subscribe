@@ -39,4 +39,15 @@ def lists():
         post_data = request.get_json()
 
         if 'casename' in post_data and post_data['casename'] == 'get':
-            return jsonify({'datas': list(SubscriberDB().find())})
+            datas = []
+            for sub in SubscriberDB().find({}, {'_id': 1}):
+                sub = Subscriber(mail=sub['_id'])
+                datas.append({
+                    '_id': sub.data['_id'],
+                    'code': sub.data['code'],
+                    'name': sub.data['name'],
+                    'mails': sub.data['mails'],
+                    'created_at': sub.data['created_at'],
+                    'admin_code': sub.render_admin_code(),
+                })
+            return jsonify({'datas': datas})

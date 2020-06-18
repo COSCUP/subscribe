@@ -6,6 +6,7 @@ from flask import request
 from flask import session
 from flask import url_for
 
+from celery_task.task_mail_sys import  mail_login_code
 from module.subscriber import Subscriber
 
 VIEW_SUBSCRIBER = Blueprint('subscriber', __name__, url_prefix='/subscriber')
@@ -19,13 +20,13 @@ def code_page(code):
     elif request.method == 'POST':
         s = Subscriber(mail=request.form['mail'])
         if not s.data:
-            return u'', 404
+            return render_template('./subscriber_error.html', show_info=('001', )), 404
 
         if s.verify_admin_code(code):
-            code = s.make_login(_type='code')
-            return u'code: %s' % code
+            mail_login_code.apply_async(kwargs={'mail': s.data['_id']})
+            return render_template('./subscriber_error.html', show_info=('002', ))
 
-        return jsonify({'info': 'no permission'}), 401
+        return render_template('./subscriber_error.html', show_info=('001', )), 404
 
 @VIEW_SUBSCRIBER.route('/token/<code>')
 def token(code):
@@ -49,4 +50,4 @@ def intro():
         return u'', 401
 
     if request.method == 'GET':
-        return u'hi intro %s' % user.data
+        return u'hi intro %s, token: %s' % (user.data, session['s_login_token'])

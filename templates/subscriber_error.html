@@ -1,0 +1,44 @@
+{% extends 'base_subscribe.html' %}
+{%block head_title%}Subscriber Info - {%endblock%}
+{% block body %}
+<section class="hero is-warning">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                訊息
+            </h1>
+            <h2 class="subtitle">
+                Info Messages
+            </h2>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+                {% if '001' in show_info %}
+                <article class="message is-warning">
+                    <div class="message-header">
+                        <p>訊息</p>
+                    </div>
+                    <div class="message-body">
+                        使用錯誤的管理頁面連結。
+                    </div>
+                </article>
+                {% endif %}
+                {% if '002' in show_info %}
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>登入連結</p>
+                    </div>
+                    <div class="message-body">
+                        已將登入連結寄送到信箱，請透過連結登入管理。
+                    </div>
+                </article>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
