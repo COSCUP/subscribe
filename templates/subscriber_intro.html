@@ -92,6 +92,7 @@
                 send: function() {
                     this.lock();
                     axios.post('./intro', {casename: 'update', data: this.data}).then(function(resp) {
+                        $subscriberintro.load();
                         $subscriberintro.unlock();
                     });
                 },

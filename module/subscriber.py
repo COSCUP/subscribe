@@ -49,6 +49,19 @@ class Subscriber(object):
 
         return SubscriberLoginTokenDB().insert_one(data).inserted_id
 
+    def update_date(self, data):
+        ''' update data
+
+        :param dict data: data
+
+        '''
+        self.data = SubscriberDB().find_one_and_update(
+            {'_id': self.data['_id']},
+            {'$set': data},
+            return_document=ReturnDocument.AFTER,
+        )
+        return self.data
+
     @classmethod
     def verify_login(cls, _type, code):
         ''' verify login code

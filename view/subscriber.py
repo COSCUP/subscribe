@@ -68,7 +68,6 @@ def token(code):
 
         return redirect(url_for('subscriber.intro', _scheme='https', _external=True))
 
-
 @VIEW_SUBSCRIBER.route('/intro', methods=('GET', 'POST'))
 def intro():
     if 's_login_token' not in session:
@@ -96,12 +95,20 @@ def intro():
                 'name': user.data['name'],
                 'mails': user.data['mails'],
                 'login_since': user.login_token_data['created_at'],
-                'unsubscribe': False,
+                'unsubscribe': user.data['unsubscribe'],
             }
             return jsonify({'data': data})
 
         elif post_data['casename'] == 'update':
-            return jsonify({'data': post_data['data']})
+            data = post_data['data']
+
+            update = {}
+            update['name'] = data['name'].strip()
+            update['status'] = bool(data['unsubscribe'])
+
+            user.update_date(data=data)
+
+            return jsonify({})
 
 @VIEW_SUBSCRIBER.route('/clean', methods=('GET', 'POST'))
 def clean():
