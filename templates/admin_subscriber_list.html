@@ -25,6 +25,7 @@
 <section class="section">
     <div class="container" id="subscribelist" v-cloak>
         <button class="button" v-on:click="load">共 [[ datas.length ]] 筆</button>
+        <button class="button" v-on:click="dl($event)">下載資料</button>
         <div class="table-container" v-if="datas.length">
             <table class="table">
                 <thead>
@@ -98,6 +99,22 @@
                         btn.href = 'https://secretary.coscup.org/subscriber/code/'+data.admin_code;
                         btn.innerText = 'Code';
                         btn.classList.add('is-info');
+                        btn.classList.remove('is-loading');
+                    });
+                },
+                dl: function($e) {
+                    let btn = $e.target;
+                    btn.classList.add('is-loading');
+
+                    axios({url: './list/dl', method: 'GET', responseType: 'text'}).then(function(resp) {
+                        window.URL = window.webkitURL || window.URL;
+                        let link = document.createElement('a');
+
+                        link.href = window.URL.createObjectURL(new Blob([resp.data], {type: 'text/csv'}));
+                        link.setAttribute('download', resp.headers['x-filename']);
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
                         btn.classList.remove('is-loading');
                     });
                 }

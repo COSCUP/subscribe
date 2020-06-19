@@ -1,7 +1,9 @@
 import csv
 import io
+from datetime import datetime
 
 from flask import Blueprint
+from flask import Response
 from flask import jsonify
 from flask import render_template
 from flask import request
@@ -57,3 +59,23 @@ def lists():
         elif post_data['casename'] == 'getcode':
             user = Subscriber(mail=post_data['_id'])
             return jsonify({'code': user.render_admin_code()})
+
+@VIEW_ADMIN_SUBSCRIBER.route('/list/dl')
+def dl():
+    ''' name, mails[-1] '''
+    with io.StringIO() as files:
+        csv_writer = csv.writer(files, quoting=csv.QUOTE_MINIMAL)
+        csv_writer.writerow(('name', 'mail', 'admin_link'))
+
+        for data in SubscriberDB().find({}, {'_id': 1}):
+            user = Subscriber(mail=data['_id'])
+            csv_writer.writerow((user.data['name'], user.data['mails'][-1], user.render_admin_code()))
+
+        filename = 'coscup_paper_subscribers_%s.csv' % datetime.now().strftime('%Y%m%d_%H%M%S')
+
+        return Response(
+                files.getvalue(),
+                mimetype='text/csv',
+                headers={'Content-disposition': 'attachment; filename=%s' % filename,
+                         'x-filename': filename,
+                })
