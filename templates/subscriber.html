@@ -28,6 +28,11 @@
                     </div>
                     <div class="field">
                         <div class="control">
+                            <div class="h-captcha" data-sitekey="b281a373-2fc9-4359-9e15-ce908cd2a64c"></div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
                             <button class="button is-outlined is-dark">
                                 送出
                             </button>
@@ -38,4 +43,7 @@
         </div>
     </div>
 </section>
+{% endblock %}
+{% block js %}
+<script src="https://hcaptcha.com/1/api.js" async defer></script>
 {% endblock %}

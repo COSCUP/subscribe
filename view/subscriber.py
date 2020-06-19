@@ -1,3 +1,6 @@
+import logging
+
+import requests
 from flask import Blueprint
 from flask import jsonify
 from flask import redirect
@@ -6,6 +9,7 @@ from flask import request
 from flask import session
 from flask import url_for
 
+import setting
 from celery_task.task_mail_sys import  mail_login_code
 from module.subscriber import Subscriber
 
@@ -22,6 +26,18 @@ def code_page(code):
         return render_template('./subscriber.html')
 
     elif request.method == 'POST':
+        r = requests.post('https://hcaptcha.com/siteverify',
+                data={'response': request.form['h-captcha-response'],
+                      'secret': setting.HCAPTCHA_TOKEN,
+                      'remoteip': request.headers.get('X-REAL-IP')}).json()
+
+        logging.info('hcaptcha: %s', r)
+
+        if not (r['success'] and r['hostname'] == 'coscup.org'):
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
         s = Subscriber(mail=request.form['mail'])
         if not s.data:
             session['show_info'] = ('001', )
