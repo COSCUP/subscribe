@@ -38,16 +38,22 @@ def lists():
     elif request.method == 'POST':
         post_data = request.get_json()
 
-        if 'casename' in post_data and post_data['casename'] == 'get':
+        if 'casename' not in post_data:
+            return u'', 401
+
+        if post_data['casename'] == 'get':
             datas = []
-            for sub in SubscriberDB().find({}, {'_id': 1}):
-                sub = Subscriber(mail=sub['_id'])
+            for data in SubscriberDB().find():
                 datas.append({
-                    '_id': sub.data['_id'],
-                    'code': sub.data['code'],
-                    'name': sub.data['name'],
-                    'mails': sub.data['mails'],
-                    'created_at': sub.data['created_at'],
-                    'admin_code': sub.render_admin_code(),
+                    '_id': data['_id'],
+                    'code': data['code'],
+                    'name': data['name'],
+                    'mails': data['mails'],
+                    'created_at': data['created_at'],
+                    'admin_code': '',
                 })
             return jsonify({'datas': datas})
+
+        elif post_data['casename'] == 'getcode':
+            user = Subscriber(mail=post_data['_id'])
+            return jsonify({'code': user.render_admin_code()})
