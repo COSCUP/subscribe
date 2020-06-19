@@ -8,6 +8,7 @@ from flask import jsonify
 from flask import render_template
 from flask import request
 
+from celery_task.task_mail_sys import mail_verify_mail
 from models.subscriberdb import SubscriberDB
 from module.subscriber import Subscriber
 
@@ -52,6 +53,7 @@ def lists():
                     'name': data['name'],
                     'mails': data['mails'],
                     'created_at': data['created_at'],
+                    'verified_email': data['verified_email'],
                     'admin_code': '',
                 })
             return jsonify({'datas': datas})
@@ -59,6 +61,10 @@ def lists():
         elif post_data['casename'] == 'getcode':
             user = Subscriber(mail=post_data['_id'])
             return jsonify({'code': user.render_admin_code()})
+
+        elif post_data['casename'] == 'sendverify':
+            mail_verify_mail.apply_async(kwargs={'mail': post_data['_id']})
+            return jsonify({})
 
 @VIEW_ADMIN_SUBSCRIBER.route('/list/dl')
 def dl():

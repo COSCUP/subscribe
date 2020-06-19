@@ -10,6 +10,7 @@ import setting
 from celery_task.celery import app
 from module.awsses import AWSSES
 from module.sender import SenderMailerSubscribeLoginCode
+from module.sender import SenderMailerSubscribeVerify
 from module.subscriber import Subscriber
 
 logger = get_task_logger(__name__)
@@ -51,6 +52,30 @@ def mail_login_code(sender, **kwargs):
     }
 
     raw_mail = SenderMailerSubscribeLoginCode(subject=subject, content=content)
+
+    name = user.data['name']
+    if not name:
+        name = user.data['mails'][-1]
+
+    mail = user.data['mails'][-1]
+    raw_mail.send(to_list=({'name': name, 'mail': mail}, ), data={})
+
+@app.task(bind=True, name='mail.verify.mail',
+    autoretry_for=(Exception, ), retry_backoff=True, max_retries=5,
+    routing_key='cst.mail.verify.mail', exchange='COSCUP-SECRETARY-TEAM')
+def mail_verify_mail(sender, **kwargs):
+    user = Subscriber(mail=kwargs['mail'])
+    if not user.data:
+        logger.warn('No user data: %s', kwargs['mail'])
+
+    subject = u'驗證 COSCUP 電子報訂閱 %d' % int(time())
+    content = {
+        'name': user.data['name'],
+        'code': user.make_login(_type='verify_mail'),
+        'preheader': '!!!',
+    }
+
+    raw_mail = SenderMailerSubscribeVerify(subject=subject, content=content)
 
     name = user.data['name']
     if not name:

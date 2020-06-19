@@ -35,7 +35,7 @@ class SubscriberLoginTokenDB(DBBase):
     def default(token, uni_mail, _type):
         ''' default data
 
-        :param str _type: code, token
+        :param str _type: code, token, verify_mail
 
         '''
         return {

@@ -11,6 +11,7 @@ from flask import url_for
 
 import setting
 from celery_task.task_mail_sys import  mail_login_code
+from models.subscriberdb import SubscriberLoginTokenDB
 from module.subscriber import Subscriber
 
 VIEW_SUBSCRIBER = Blueprint('subscriber', __name__, url_prefix='/subscriber')
@@ -67,6 +68,45 @@ def token(code):
         session['s_login_token'] = s.make_login('token')
 
         return redirect(url_for('subscriber.intro', _scheme='https', _external=True))
+
+@VIEW_SUBSCRIBER.route('/verify_mail/<code>', methods=('GET', 'POST'))
+def verify_mail(code):
+    if request.method == 'GET':
+        return render_template('./subscriber_verify_mail.html')
+
+    elif request.method == 'POST':
+        if not request.form['iamok']:
+            return u'', 401
+
+        r = requests.post('https://hcaptcha.com/siteverify',
+                data={'response': request.form['h-captcha-response'],
+                      'secret': setting.HCAPTCHA_TOKEN,
+                      'remoteip': request.headers.get('X-REAL-IP')}).json()
+
+        logging.info('hcaptcha: %s', r)
+
+        if not (r['success'] and r['hostname'] == 'coscup.org'):
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        token = SubscriberLoginTokenDB().find_one({'_id': code})
+        if not token:
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        s = Subscriber(mail=token['uni_mail'])
+        if not s.data:
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        s.verify_login(_type='verify_mail', code=code)
+
+        session['show_info'] = ('005', )
+        session['status_code'] = 200
+        return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
 @VIEW_SUBSCRIBER.route('/intro', methods=('GET', 'POST'))
 def intro():

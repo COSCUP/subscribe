@@ -1,0 +1,52 @@
+{% extends 'base_subscribe.html' %}
+{%block head_title%}Subscriber login - {%endblock%}
+{% block body %}
+<section class="hero is-warning">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                確認郵件信箱
+            </h1>
+            <h2 class="subtitle">
+                Verify the mail
+            </h2>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+                <div class="content">
+                    <h3>請確認訂閱</h3>
+                </div>
+                <form class="form" method="POST">
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                <input type="checkbox" name="iamok" required>
+                                確認訂閱
+                            </label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <div class="h-captcha" data-sitekey="b281a373-2fc9-4359-9e15-ce908cd2a64c"></div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-outlined is-dark">
+                                送出
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block js %}
+<script src="https://hcaptcha.com/1/api.js" async defer></script>
+{% endblock %}

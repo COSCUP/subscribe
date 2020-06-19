@@ -50,3 +50,11 @@ class SenderMailerSubscribeLoginCode(SenderMailer):
         super(SenderMailerSubscribeLoginCode, self).__init__(
             template_path='/app/templates/mail/coscup_subscribe_login_code.html',
             subject=subject, content=content, source=source)
+
+
+class SenderMailerSubscribeVerify(SenderMailer):
+    ''' Sender for subscriber verify mail '''
+    def __init__(self, subject, content, source=None):
+        super(SenderMailerSubscribeVerify, self).__init__(
+            template_path='/app/templates/mail/coscup_subscribe_verify_mail.html',
+            subject=subject, content=content, source=source)

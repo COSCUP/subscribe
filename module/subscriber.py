@@ -36,10 +36,10 @@ class Subscriber(object):
     def make_login(self, _type):
         ''' make an login code
 
-        :param str _type: code, token
+        :param str _type: code, token, verify_mail
 
         '''
-        if _type not in ('code', 'token'):
+        if _type not in ('code', 'token', 'verify_mail'):
             raise Exception('type error')
 
         token = self.shadata(str(uuid4()) + str(uuid4()))
@@ -69,20 +69,29 @@ class Subscriber(object):
         :param str _type: code, token
 
         '''
+        query = {'_id': code, '_type': _type}
         if _type == 'code':
-            before = datetime.fromtimestamp(time() - 600)
+            query['created_at'] = {'$gte': datetime.fromtimestamp(time() - 600)}
 
         elif _type == 'token':
-            before = datetime.fromtimestamp(time() - 3600)
+            query['created_at'] = {'$gte': datetime.fromtimestamp(time() - 3600)}
 
-        login_token = SubscriberLoginTokenDB().find_one(
-                {'_id': code, '_type': _type, 'created_at': {'$gte': before}})
+        login_token = SubscriberLoginTokenDB().find_one(query)
 
         if not login_token:
             return False
 
         user = cls(mail=login_token['uni_mail'])
-        user.login_token_data = login_token
+
+        if _type in ('code', 'token'):
+            user.login_token_data = login_token
+
+        elif _type in ('verify_mail', ):
+            SubscriberDB().find_one_and_update(
+                    {'_id': user.data['_id']},
+                    {'$set': {'verified_email': True}},
+                )
+            user = cls(mail=user.data['_id'])
 
         return user
 
