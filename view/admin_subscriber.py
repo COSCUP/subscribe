@@ -54,6 +54,7 @@ def lists():
                     'mails': data['mails'],
                     'created_at': data['created_at'],
                     'verified_email': data['verified_email'],
+                    'status': data['status'],
                     'admin_code': '',
                 })
             return jsonify({'datas': datas})

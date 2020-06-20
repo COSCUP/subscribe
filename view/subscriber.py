@@ -40,7 +40,7 @@ def code_page(code):
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         s = Subscriber(mail=request.form['mail'])
-        if not s.data:
+        if not s or not s.data:
             session['show_info'] = ('001', )
             session['status_code'] = 404
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
@@ -72,6 +72,23 @@ def token(code):
 @VIEW_SUBSCRIBER.route('/verify_mail/<code>', methods=('GET', 'POST'))
 def verify_mail(code):
     if request.method == 'GET':
+        token = SubscriberLoginTokenDB().find_one({'_id': code})
+        if not token:
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        s = Subscriber(mail=token['uni_mail'])
+        if not s or not s.data:
+            session['show_info'] = ('001', )
+            session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        if s.data['verified_email']:
+            session['show_info'] = ('005', )
+            session['status_code'] = 200
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
         return render_template('./subscriber_verify_mail.html')
 
     elif request.method == 'POST':
@@ -97,7 +114,7 @@ def verify_mail(code):
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         s = Subscriber(mail=token['uni_mail'])
-        if not s.data:
+        if not s or not s.data:
             session['show_info'] = ('001', )
             session['status_code'] = 404
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
@@ -135,7 +152,7 @@ def intro():
                 'name': user.data['name'],
                 'mails': user.data['mails'],
                 'login_since': user.login_token_data['created_at'],
-                'unsubscribe': user.data['unsubscribe'],
+                'unsubscribe': not user.data['status'],
             }
             return jsonify({'data': data})
 
@@ -144,9 +161,9 @@ def intro():
 
             update = {}
             update['name'] = data['name'].strip()
-            update['status'] = bool(data['unsubscribe'])
+            update['status'] = not bool(data['unsubscribe'])
 
-            user.update_date(data=data)
+            user.update_date(data=update)
 
             return jsonify({})
 

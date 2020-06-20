@@ -32,29 +32,48 @@
                     <tr>
                         <th>index</th>
                         <th>code</th>
+                        <th>status</th>
                         <th>verify</th>
-                        <th>mail</th>
                         <th>uni mail</th>
                         <th>name</th>
+                        <th>mail</th>
                         <th>admin code</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(data, index) in datas">
                         <td>[[ index+1 ]].</td>
-                        <td>[[ data.code ]]</td>
+                        <td><span class="tag is-family-monospace">[[ data.code ]]</span></td>
                         <td>
-                            <span v-if="data.verified_email" class="icon has-text-info">
-                                <i class="fas fa-check-circle"></i>
-                            </span>
+                            <a class="button is-outlined"
+                                v-on:click="changestatus(data, $event)">
+                                <span class="icon"
+                                      :class="{'has-text-success': data.status, 'has-text-danger': !data.status}">
+                                    <i v-if="data.status" class="fas fa-check-circle"></i>
+                                    <i v-if="!data.status" class="far fa-times-circle"></i>
+                                </span>
+                            </a>
+                        </td>
+                        <td>
+                            <a v-if="data.verified_email" class="button is-static">
+                                <span class="icon has-text-info">
+                                    <i class="fas fa-check-circle"></i>
+                                </span>
+                            </a>
                             <a v-if="!data.verified_email" class="button is-outlined"
                                v-on:click="sendverify(data, $event)">
-                                <span class="icon"><i class="far fa-paper-plane"></i></span>
+                                <span class="icon has-text-success-dark"><i class="far fa-paper-plane"></i></span>
                             </a>
                         </td>
                         <td>[[ data._id ]]</td>
                         <td>[[ data.name ]]</td>
-                        <td>[[ data.mails ]]</td>
+                        <td>
+                            <span class="tag" :title="data.mails.join(', ')"
+                                  :class="{'is-warning': data.mails.length > 1}"
+                                >
+                                [[ data.mails.length ]]
+                            </span>
+                        </td>
                         <td>
                             <a class="button is-outlined" v-on:click="getcode(data, $event)">
                                 Get Code
@@ -118,6 +137,9 @@
                     axios.post('./list', {casename: 'sendverify', _id: data._id}).then(function(resp) {
                         btn.classList.remove('is-loading');
                     });
+                },
+                changestatus: function(data, $e) {
+                    data.status = !data.status;
                 },
                 dl: function($e) {
                     let btn = $e.target;
