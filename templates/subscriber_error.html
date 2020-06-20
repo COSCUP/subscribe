@@ -82,6 +82,32 @@
                     </div>
                 </article>
                 {% endif %}
+                {% if '006' in show_info %}
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <span>需要允許</span>
+                        </p>
+                    </div>
+                    <div class="message-body">
+                        需要您的允許才可以繼續。Need your approval.
+                    </div>
+                </article>
+                {% endif %}
+                {% if '007' in show_info %}
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <span>感謝 Thank you</span>
+                        </p>
+                    </div>
+                    <div class="message-body">
+                        感謝訂閱。Thank you for your subscription.
+                    </div>
+                </article>
+                {% endif %}
             </div>
         </div>
     </div>

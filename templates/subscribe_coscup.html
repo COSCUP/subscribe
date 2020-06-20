@@ -1,0 +1,78 @@
+{% extends 'base_subscribe.html' %}
+{%block head_title%}Subscribe COSCUP NEWS 訂閱電子報 - {%endblock%}
+{%block header%}
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@coscup">
+<meta property="og:title" content="Subscribe COSCUP NEWS 訂閱電子報">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="COSCUP Secretary">
+<meta property="og:image" content="https://secretary.coscup.org/s3/icon/newspaper.png">
+<meta property="og:description" content="Subscribe COSCUP Activities, 訂閱 COSCUP 活動訊息電子報！">
+<meta name="theme-color" content="#48c774">
+{%endblock%}
+{% block body %}
+<section class="hero is-warning">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                訂閱 COSCUP 活動訊息電子報
+            </h1>
+            <h2 class="subtitle">
+                Subscribe COSCUP newsletter.
+            </h2>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+                <div class="content">
+                    <h4>使用範圍 / Agreememt</h4>
+                    <p>訂閱只會收到 COSCUP 活動期間的訊息通知。在訂閱後會有確認信與取消訂閱的方式說明。如有其他問題詢問，可以寄信到 <a href="mailto:attentee@coscup.org">attentee@coscup.org</a>.</p>
+                    <p>We will only send information related to COSCUP activities. After submitting, you will receive a validation email (not in real time), and the way to unsubscribe. If you have any questions, please email us at <a href="mailto:attentee@coscup.org">attentee@coscup.org</a>.</p>
+                </div>
+                <form class="form" method="POST">
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                <input type="checkbox" name="iamok" required>
+                                同意 COSCUP 的使用規範 / accepted
+                            </label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Mail</label>
+                        <div class="control">
+                            <input class="input" type="email" name="mail" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                            <input class="input" type="text" name="name">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">我不是機器人 / I am human</label>
+                        <div class="control">
+                            <div class="h-captcha" data-sitekey="b281a373-2fc9-4359-9e15-ce908cd2a64c"></div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-outlined is-dark">
+                                <span class="icon"><i class="far fa-paper-plane"></i></span>
+                                <span>訂閱 / Subscribe</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block js %}
+<script src="https://hcaptcha.com/1/api.js" async defer></script>
+{% endblock %}

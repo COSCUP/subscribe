@@ -27,6 +27,7 @@ from flask import url_for
 import setting
 from celery_task.task_mail_sys import mail_sys_weberror
 from view.admin_subscriber import VIEW_ADMIN_SUBSCRIBER
+from view.subscribe import VIEW_SUBSCRIBE
 from view.subscriber import VIEW_SUBSCRIBER
 
 
@@ -34,6 +35,7 @@ app = Flask(__name__)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = setting.SECRET_KEY
 app.register_blueprint(VIEW_ADMIN_SUBSCRIBER)
+app.register_blueprint(VIEW_SUBSCRIBE)
 app.register_blueprint(VIEW_SUBSCRIBER)
 
 
@@ -53,7 +55,9 @@ def need_login():
             session, )
        )
 
-    if request.path not in NO_NEED_LOGIN_PATH and not request.path.startswith('/subscriber'):
+    if request.path not in NO_NEED_LOGIN_PATH \
+            and not request.path.startswith('/subscriber') \
+            and not request.path.startswith('/subscribe'):
         if not session.get('u'):
             session['r'] = request.path
             return redirect(url_for('oauth2logout', _scheme='https', _external=True))
