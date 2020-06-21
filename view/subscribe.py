@@ -41,6 +41,7 @@ def coscup():
         user = Subscriber(mail=request.form['mail'])
         if not user.data:
             Subscriber.process_upload(mail=request.form['mail'], name=request.form['name'])
+            user = Subscriber(mail=request.form['mail'])
             mail_verify_mail.apply_async(kwargs={'mail': user.data['_id']})
 
         elif user.data and not user.data['verified_email']:
