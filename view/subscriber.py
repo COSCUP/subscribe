@@ -75,6 +75,7 @@ def token(code):
             session['status_code'] = 404
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
+        Subscriber.make_code_disabled(code=code)
         session['s_login_token'] = s.make_login('token')
 
         return redirect(url_for('subscriber.intro', _scheme='https', _external=True))

@@ -28,10 +28,13 @@ def add():
         data = io.StringIO(request.files['file'].read().decode('utf-8'))
         csv_data = list(csv.DictReader(data))
 
+        _new = 0
         for data in csv_data:
-            Subscriber.process_upload(mail=data['mail'], name=data['name'])
+            _type, uni_mail = Subscriber.process_upload(mail=data['mail'], name=data['name'])
+            if _type == 'new':
+                _new += 1
 
-        return u'add: %s' % len(csv_data)
+        return u'process: %s, new: %s' % (len(csv_data), _new)
 
 @VIEW_ADMIN_SUBSCRIBER.route('/list', methods=('GET', 'POST'))
 def lists():
@@ -72,11 +75,17 @@ def dl():
     ''' name, mails[-1] '''
     with io.StringIO() as files:
         csv_writer = csv.writer(files, quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writerow(('name', 'mail', 'admin_link'))
+        csv_writer.writerow(('name', 'mail', 'status', 'verified_email', 'admin_link'))
 
         for data in SubscriberDB().find({}, {'_id': 1}):
             user = Subscriber(mail=data['_id'])
-            csv_writer.writerow((user.data['name'], user.data['mails'][-1], user.render_admin_code()))
+            csv_writer.writerow((
+                    user.data['name'],
+                    user.data['mails'][-1],
+                    int(user.data['status']),
+                    int(user.data['verified_email']),
+                    user.render_admin_code(),
+                ))
 
         filename = 'coscup_paper_subscribers_%s.csv' % datetime.now().strftime('%Y%m%d_%H%M%S')
 

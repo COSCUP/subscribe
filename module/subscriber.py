@@ -72,6 +72,7 @@ class Subscriber(object):
         query = {'_id': code, '_type': _type}
         if _type == 'code':
             query['created_at'] = {'$gte': datetime.fromtimestamp(time() - 600)}
+            query['$or'] = [{'disabled': {'$exists': False}}, {'disabled': False}]
 
         elif _type == 'token':
             query['created_at'] = {'$gte': datetime.fromtimestamp(time() - 3600)}
@@ -94,6 +95,15 @@ class Subscriber(object):
             user = cls(mail=user.data['_id'])
 
         return user
+
+    @staticmethod
+    def make_code_disabled(code):
+        ''' Make code disabled
+
+        :param str code: code
+
+        '''
+        SubscriberLoginTokenDB().find_one_and_update({'_id': code}, {'$set': {'disabled': True}})
 
     @classmethod
     def process_upload(cls, mail, name):
@@ -118,11 +128,13 @@ class Subscriber(object):
                 _update['$set'] = {'name': name}
 
             SubscriberDB().update({'_id': uni_mail}, _update)
+            return ('update', uni_mail)
         else:
             insert_data = SubscriberDB.default(
                     uni_mail=uni_mail, name=name.strip(), mails=[mail, ])
 
             SubscriberDB().insert_one(insert_data)
+            return ('new', uni_mail)
 
     @staticmethod
     def format_mail(mail):

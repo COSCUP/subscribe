@@ -31,12 +31,13 @@
                 <thead>
                     <tr>
                         <th>index</th>
-                        <th>code</th>
-                        <th>status</th>
-                        <th>verify</th>
-                        <th>uni mail</th>
-                        <th>name</th>
+                        <th v-on:click="sort_('code')">code</th>
+                        <th v-on:click="sort_('status')">status</th>
+                        <th v-on:click="sort_('verified_email')">verify</th>
+                        <th v-on:click="sort_('_id')">uni mail</th>
+                        <th v-on:click="sort_('name')">name</th>
                         <th>mail</th>
+                        <th v-on:click="sort_('created_at')">date</th>
                         <th>admin code</th>
                     </tr>
                 </thead>
@@ -76,6 +77,9 @@
                             </span>
                         </td>
                         <td style="vertical-align:middle;">
+                            [[ new Date(data.created_at).toLocaleString() ]]
+                        </td>
+                        <td style="vertical-align:middle;">
                             <a class="button is-outlined" v-on:click="getcode(data, $event)">
                                 Get Code
                             </a>
@@ -94,7 +98,8 @@
         let $subscribelist = new Vue({
             el: '#subscribelist',
             data: {
-                datas: []
+                datas: [],
+                sort_verify_asc: 1
             },
             mounted: function() {
                 this.load();
@@ -164,6 +169,19 @@
                         link.remove();
                         btn.classList.remove('is-loading');
                     });
+                },
+                sort_: function(key) {
+                    let asc = this.sort_verify_asc;
+                    this.datas.sort(function(a, b) {
+                        if (a[key] > b[key]) {
+                            return 1*asc;
+                        }
+                        if (a[key] < b[key]) {
+                            return -1*asc;
+                        }
+                        return 0;
+                    });
+                    this.sort_verify_asc = this.sort_verify_asc * -1;
                 }
             },
             delimiters: ['[[', ']]']

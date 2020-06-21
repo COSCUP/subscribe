@@ -39,16 +39,17 @@ def coscup():
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         user = Subscriber(mail=request.form['mail'])
+        Subscriber.process_upload(mail=request.form['mail'], name=request.form['name'])
         if not user.data:
-            Subscriber.process_upload(mail=request.form['mail'], name=request.form['name'])
             user = Subscriber(mail=request.form['mail'])
             mail_verify_mail.apply_async(kwargs={'mail': user.data['_id']})
 
-        elif user.data and not user.data['verified_email']:
-            mail_verify_mail.apply_async(kwargs={'mail': user.data['_id']})
+        elif user.data:
+            if not user.data['verified_email']:
+                mail_verify_mail.apply_async(kwargs={'mail': user.data['_id']})
 
-        if user.data and not user.data['status']:
-            user.update_date({'status': True})
+            if not user.data['status']:
+                user.update_date({'status': True})
 
         session['show_info'] = ('007', )
         session['status_code'] = 200
