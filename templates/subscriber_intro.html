@@ -22,7 +22,7 @@
                     <div class="control">
                         <input class="input" type="text" v-model="data.name">
                     </div>
-                    <p class="help is-info">收件人的稱呼。</p>
+                    <p class="help is-info">收件人的稱呼。Your name.</p>
                 </div>
                 <div class="field">
                     <label class="label">Mails</label>
@@ -31,35 +31,34 @@
                             <span class="tag is-success is-light" v-for="mail in data.mails">[[ mail ]]</span>
                         </div>
                     </div>
-                    <p class="help is-info">所登記的信箱，會使用最後一個來發送。</p>
+                    <p class="help is-info">所登記的信箱，會使用最後一個來發送。We will use the lastest mail address to send.</p>
                 </div>
                 <div class="field">
-                    <label class="label has-text-danger-dark">Unsubscribe 取消訂閱</label>
+                    <label class="label has-text-danger-dark">取消訂閱</label>
                     <div class="control">
                         <label class="checkbox">
                             <input type="checkbox" v-model="data.unsubscribe">
-                            取消訂閱、移除訂閱清單！
+                            取消訂閱、移除訂閱清單！ / Unsubscribe.
                         </label>
                     </div>
-                    <p class="help is-danger">再也不收 COSCUP 的訊息。</p>
+                    <p class="help is-danger">Unsubscribe the news letter.</p>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
                         <button class="button is-link is-outlined" v-on:click="send">
                             <span class="icon"><i class="far fa-check-circle"></i></span>
-                            <span>Update</span>
+                            <span>更新 / Update</span>
                         </button>
                     </div>
                     <div class="control">
                         <a href='./clean' class="button is-outlined">
                             <span class="icon"><i class="fas fa-power-off"></i></span>
-                            <span>結束本次登入管理</span>
+                            <span>結束本次登入管理 / Logout</span>
                             <span class="icon"><i class="fas fa-hourglass-half"></i></span>
                             <span>([[ expired ]])</span>
                         </a>
                     </div>
                 </div>
-                <pre>[[ data ]]</pre>
             </div>
         </div>
     </div>

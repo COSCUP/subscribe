@@ -17,72 +17,72 @@
     <div class="container">
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
-                {% if '001' in show_info %}
+                {% if '001' in show_info or '000' in show_info %}
                 <article class="message is-warning">
                     <div class="message-header">
                         <p>
                             <span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
-                            <span>訊息</span>
+                            <span>訊息 / Message</span>
                         </p>
                     </div>
                     <div class="message-body">
-                        使用錯誤的管理頁面連結或無效的非機器人驗證。
+                        使用錯誤的管理頁面連結或無效的非機器人驗證。 Using the wrong Login link or not pass the 'I am human'.
                     </div>
                 </article>
                 {% endif %}
-                {% if '002' in show_info %}
+                {% if '002' in show_info or '000' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
                         <p>
                             <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
-                            <span>登入連結</span>
+                            <span>登入連結 / Login link</span>
                         </p>
                     </div>
                     <div class="message-body">
-                        已將登入連結寄送到信箱，請透過連結登入管理。
+                        已將登入連結寄送到信箱，請透過連結登入管理。 Login link alreay send to you, please check your inbox.
                     </div>
                 </article>
                 {% endif %}
-                {% if '003' in show_info %}
+                {% if '003' in show_info or '000' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
                         <p>
                             <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
-                            <span>登入失敗</span>
+                            <span>登入失敗 / Login Fail</span>
                         </p>
                     </div>
                     <div class="message-body">
-                        登入憑證已過期，請重新取得登入憑證。
+                        登入憑證已過期，請重新取得登入憑證。 Login token expired, please click management link to re-isuess the token.
                     </div>
                 </article>
                 {% endif %}
-                {% if '004' in show_info %}
+                {% if '004' in show_info or '000' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
                         <p>
                             <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
-                            <span>已清除</span>
+                            <span>已清除 / Logout</span>
                         </p>
                     </div>
                     <div class="message-body">
-                        已清除憑證，感謝使用。
+                        已清除憑證，感謝使用。 Session removed, thanks.
                     </div>
                 </article>
                 {% endif %}
-                {% if '005' in show_info %}
+                {% if '005' in show_info or '000' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
                         <p>
                             <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
-                            <span>信箱確認</span>
+                            <span>信箱確認 / Email confirmed</span>
                         </p>
                     </div>
                     <div class="message-body">
-                        已確認信箱，感謝訂閱。
+                        已確認信箱，感謝訂閱。 Email confirmed, thanks.
                     </div>
                 </article>
                 {% endif %}
-                {% if '006' in show_info %}
+                {% if '006' in show_info or '000' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
                         <p>
@@ -95,7 +95,7 @@
                     </div>
                 </article>
                 {% endif %}
-                {% if '007' in show_info %}
+                {% if '007' in show_info or '000' in show_info %}
                 <article class="message is-info">
                     <div class="message-header">
                         <p>
@@ -107,6 +107,20 @@
                         感謝訂閱。Thank you for your subscription.
                     </div>
                 </article>
+                {% endif %}
+                {% if '008' in show_info or '000' in show_info %}
+                <article class="message is-info">
+                    <div class="message-header">
+                        <p>
+                            <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+                            <span>已取消訂閱 / Unsubscribed</span>
+                        </p>
+                    </div>
+                    <div class="message-body">
+                        已取消訂閱，請重新訂閱。 Unsubscribed, please re-subscribe.
+                    </div>
+                </article>
+                <a href="/subscribe/coscup" class="button is-outlined is-dark">Go to Subscribe</a>
                 {% endif %}
             </div>
         </div>

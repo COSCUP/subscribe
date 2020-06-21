@@ -47,6 +47,11 @@ def coscup():
         elif user.data and not user.data['verified_email']:
             mail_verify_mail.apply_async(kwargs={'mail': user.data['_id']})
 
+        if user.data and not user.data['status']:
+            user.update_date({'status': True})
+
         session['show_info'] = ('007', )
         session['status_code'] = 200
         return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+    return u''

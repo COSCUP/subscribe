@@ -44,7 +44,7 @@ def mail_login_code(sender, **kwargs):
     if not user.data:
         logger.warn('No user data: %s', kwargs['mail'])
 
-    subject = u'管理 COSCUP 電子報訂閱連結 %d' % int(time())
+    subject = u'[Login] 管理 COSCUP 電子報訂閱連結 / Login for management subscription (%d)' % int(time())
     content = {
         'name': user.data['name'],
         'code': user.make_login(_type='code'),
@@ -68,7 +68,7 @@ def mail_verify_mail(sender, **kwargs):
     if not user.data:
         logger.warn('No user data: %s', kwargs['mail'])
 
-    subject = u'驗證 COSCUP 電子報訂閱 %d' % int(time())
+    subject = u'[Verify] 驗證 COSCUP 電子報訂閱 / Your Subscription (%d)' % int(time())
     content = {
         'name': user.data['name'],
         'code': user.make_login(_type='verify_mail'),

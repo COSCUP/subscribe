@@ -18,8 +18,13 @@ VIEW_SUBSCRIBER = Blueprint('subscriber', __name__, url_prefix='/subscriber')
 
 @VIEW_SUBSCRIBER.route('/infomsg')
 def info_msg():
+    if request.args.get('all'):
+        show_info = ('000', )
+    else:
+        show_info = session.get('show_info', [])
+
     return render_template('./subscriber_error.html',
-            show_info=session.get('show_info', [])), session.get('status_code', 401)
+            show_info=show_info), session.get('status_code', 401)
 
 @VIEW_SUBSCRIBER.route('/code/<code>', methods=('GET', 'POST'))
 def code_page(code):
@@ -43,6 +48,11 @@ def code_page(code):
         if not s or not s.data:
             session['show_info'] = ('001', )
             session['status_code'] = 404
+            return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
+
+        if not s.data['status']:
+            session['show_info'] = ('008', )
+            session['status_code'] = 200
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         if s.verify_admin_code(code):

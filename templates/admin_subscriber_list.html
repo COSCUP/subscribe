@@ -42,9 +42,9 @@
                 </thead>
                 <tbody>
                     <tr v-for="(data, index) in datas">
-                        <td>[[ index+1 ]].</td>
-                        <td><span class="tag is-family-monospace">[[ data.code ]]</span></td>
-                        <td>
+                        <td style="vertical-align:middle;">[[ index+1 ]].</td>
+                        <td style="vertical-align:middle;"><span class="tag is-family-monospace">[[ data.code ]]</span></td>
+                        <td style="vertical-align:middle;">
                             <a class="button is-outlined"
                                 v-on:click="changestatus(data, $event)">
                                 <span class="icon"
@@ -54,7 +54,7 @@
                                 </span>
                             </a>
                         </td>
-                        <td>
+                        <td style="vertical-align:middle;">
                             <a v-if="data.verified_email" class="button is-static">
                                 <span class="icon has-text-info">
                                     <i class="fas fa-check-circle"></i>
@@ -63,18 +63,19 @@
                             <a v-if="!data.verified_email" class="button is-outlined"
                                v-on:click="sendverify(data, $event)">
                                 <span class="icon has-text-success-dark"><i class="far fa-paper-plane"></i></span>
+                                <span>[[ data.verifytimes ]]</span>
                             </a>
                         </td>
-                        <td>[[ data._id ]]</td>
-                        <td>[[ data.name ]]</td>
-                        <td>
+                        <td style="vertical-align:middle;">[[ data._id ]]</td>
+                        <td style="vertical-align:middle;">[[ data.name ]]</td>
+                        <td style="vertical-align:middle;">
                             <span class="tag" :title="data.mails.join(', ')"
                                   :class="{'is-warning': data.mails.length > 1}"
                                 >
                                 [[ data.mails.length ]]
                             </span>
                         </td>
-                        <td>
+                        <td style="vertical-align:middle;">
                             <a class="button is-outlined" v-on:click="getcode(data, $event)">
                                 Get Code
                             </a>
@@ -112,6 +113,11 @@
                             }
                             return 0;
                         });
+                        resp.data.datas.forEach(function(data) {
+                            if (data.verified_email == false) {
+                                data.verifytimes = 0;
+                            }
+                        });
                         $subscribelist.datas = resp.data.datas;
                         btn.classList.remove('is-loading');
                     });
@@ -133,6 +139,8 @@
                 },
                 sendverify: function(data, $e) {
                     let btn = $e.target;
+                    data.verifytimes = data.verifytimes + 1;
+
                     btn.classList.add('is-loading');
                     axios.post('./list', {casename: 'sendverify', _id: data._id}).then(function(resp) {
                         btn.classList.remove('is-loading');
