@@ -58,7 +58,10 @@ def mail_login_code(sender, **kwargs):
         name = user.data['mails'][-1]
 
     mail = user.data['mails'][-1]
-    raw_mail.send(to_list=({'name': name, 'mail': mail}, ), data={})
+    logger.info('mail: %s, ses: %s',
+        mail,
+        raw_mail.send(to_list=({'name': name, 'mail': mail}, ), data={}),
+    )
 
 @app.task(bind=True, name='mail.verify.mail',
     autoretry_for=(Exception, ), retry_backoff=True, max_retries=5,
@@ -82,4 +85,8 @@ def mail_verify_mail(sender, **kwargs):
         name = user.data['mails'][-1]
 
     mail = user.data['mails'][-1]
-    raw_mail.send(to_list=({'name': name, 'mail': mail}, ), data={})
+
+    logger.info('mail: %s, ses: %s',
+        mail,
+        raw_mail.send(to_list=({'name': name, 'mail': mail}, ), data={}),
+    )
