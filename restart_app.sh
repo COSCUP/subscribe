@@ -9,3 +9,8 @@ docker stop -t 1 secretary-1
 docker rm secretary-1
 
 sh ./start_app.sh
+
+docker stop -t 1 secretary-2
+docker rm secretary-2
+
+sh ./start_app.sh
