@@ -77,7 +77,7 @@
                             </span>
                         </td>
                         <td style="vertical-align:middle;">
-                            [[ new Date(data.created_at).toLocaleString() ]]
+                            [[ data.created_at.toLocaleString() ]]
                         </td>
                         <td style="vertical-align:middle;">
                             <a class="button is-outlined" v-on:click="getcode(data, $event)">
@@ -119,6 +119,7 @@
                             return 0;
                         });
                         resp.data.datas.forEach(function(data) {
+                            data.created_at = new Date(data.created_at);
                             if (data.verified_email == false) {
                                 data.verifytimes = 0;
                             }
