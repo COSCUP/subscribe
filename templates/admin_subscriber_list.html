@@ -24,8 +24,28 @@
 </section>
 <section class="section">
     <div class="container" id="subscribelist" v-cloak>
-        <button class="button" v-on:click="load">共 [[ datas.length ]] 筆</button>
-        <button class="button" v-on:click="dl($event)">下載資料</button>
+        <div class="field">
+            <button class="button" v-on:click="load">共 [[ datas.length ]] 筆</button>
+            <button class="button" v-on:click="dl($event)">下載資料</button>
+            <a class="button is-outlined" v-on:click="load">
+                <span>Status:</span>
+                <span class="icon has-text-success">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+                <span>[[ count_status.true ]]</span>
+                <span class="icon has-text-danger">
+                    <i class="far fa-times-circle"></i>
+                </span>
+                <span>[[ count_status.false ]]</span>
+            </a>
+            <a class="button is-outlined" v-on:click="load">
+                <span>!Verified:</span>
+                <span class="icon has-text-success-dark">
+                    <i class="far fa-paper-plane"></i>
+                </span>
+                <span>[[ count_verified_email.false ]]</span>
+            </a>
+        </div>
         <div class="table-container" v-if="datas.length">
             <table class="table">
                 <thead>
@@ -99,26 +119,51 @@
             el: '#subscribelist',
             data: {
                 datas: [],
-                sort_verify_asc: 1
+                sort_verify_asc: 1,
+                count_status: {
+                    true: 0,
+                    false: 0,
+                },
+                count_verified_email: {
+                    true: 0,
+                    false: 0,
+                }
             },
             mounted: function() {
                 this.load();
             },
             methods: {
                 load: function() {
+                    let $btns = this.$el.querySelectorAll('.field .button');
+                    $btns.forEach(function(btn) {
+                        btn.classList.add('is-loading');
+                    });
+
                     this.sort_verify_asc = 1;
-                    let btn = this.$el.querySelector('button');
-                    btn.classList.add('is-loading');
+                    this.count_status = {true: 0, false: 0};
+                    this.count_verified_email = {true: 0, false: 0};
+
                     axios.post('./list', {casename: 'get'}).then(function(resp) {
                         resp.data.datas.forEach(function(data) {
                             data.created_at = new Date(data.created_at);
                             if (data.verified_email == false) {
                                 data.verifytimes = 0;
                             }
+
+                            if (data.status == true) {
+                                $subscribelist.count_status.true = $subscribelist.count_status.true + 1;
+                                if (data.verified_email == false) {
+                                    $subscribelist.count_verified_email.false = $subscribelist.count_verified_email.false + 1;
+                                }
+                            } else {
+                                $subscribelist.count_status.false = $subscribelist.count_status.false + 1;
+                            }
                         });
                         $subscribelist.datas = resp.data.datas;
                         $subscribelist.sort_('_id');
-                        btn.classList.remove('is-loading');
+                        $btns.forEach(function(btn) {
+                            btn.classList.remove('is-loading');
+                        });
                     });
                 },
                 getcode: function(data, $e) {
