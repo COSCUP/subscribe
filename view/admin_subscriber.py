@@ -66,6 +66,12 @@ def lists():
             user = Subscriber(mail=post_data['_id'])
             return jsonify({'code': user.render_admin_code()})
 
+        elif post_data['casename'] == 'changestatus':
+            user = Subscriber(mail=post_data['_id'])
+            user.update_date({'status': post_data['status']})
+
+            return jsonify({'data': post_data})
+
         elif post_data['casename'] == 'sendverify':
             mail_verify_mail.apply_async(kwargs={'mail': post_data['_id']})
             return jsonify({})

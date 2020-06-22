@@ -61,7 +61,7 @@
                                     <i class="fas fa-check-circle"></i>
                                 </span>
                             </a>
-                            <a v-if="!data.verified_email" class="button is-outlined"
+                            <a v-if="!data.verified_email && data.status" class="button is-outlined"
                                v-on:click="sendverify(data, $event)">
                                 <span class="icon has-text-success-dark"><i class="far fa-paper-plane"></i></span>
                                 <span>[[ data.verifytimes ]]</span>
@@ -106,18 +106,10 @@
             },
             methods: {
                 load: function() {
+                    this.sort_verify_asc = 1;
                     let btn = this.$el.querySelector('button');
                     btn.classList.add('is-loading');
                     axios.post('./list', {casename: 'get'}).then(function(resp) {
-                        resp.data.datas.sort(function(a, b) {
-                            if (a._id > b._id) {
-                                return 1;
-                            }
-                            if (a._id < b._id) {
-                                return -1;
-                            }
-                            return 0;
-                        });
                         resp.data.datas.forEach(function(data) {
                             data.created_at = new Date(data.created_at);
                             if (data.verified_email == false) {
@@ -125,6 +117,7 @@
                             }
                         });
                         $subscribelist.datas = resp.data.datas;
+                        $subscribelist.sort_('_id');
                         btn.classList.remove('is-loading');
                     });
                 },
@@ -154,6 +147,12 @@
                 },
                 changestatus: function(data, $e) {
                     data.status = !data.status;
+                    $e.target.classList.add('is-loading');
+
+                    axios.post('./list', {casename: 'changestatus', _id: data._id, status: data.status}).
+                        then(function(resp){
+                            $e.target.classList.remove('is-loading');
+                        });
                 },
                 dl: function($e) {
                     let btn = $e.target;
@@ -179,6 +178,15 @@
                         }
                         if (a[key] < b[key]) {
                             return -1*asc;
+                        }
+                        return 0;
+                    });
+                    this.datas.sort(function(a, b) {
+                        if (a.status > b.status) {
+                            return 1;
+                        }
+                        if (a.status < b.status) {
+                            return -1;
                         }
                         return 0;
                     });
