@@ -10,6 +10,7 @@ from flask import url_for
 
 import setting
 from celery_task.task_mail_sys import mail_verify_mail
+from models.subscriberdb import SubscriberDB
 from module.subscriber import Subscriber
 
 VIEW_SUBSCRIBE = Blueprint('subscribe', __name__, url_prefix='/subscribe')
@@ -18,7 +19,8 @@ VIEW_SUBSCRIBE = Blueprint('subscribe', __name__, url_prefix='/subscribe')
 def coscup():
     ''' subscribe coscup '''
     if request.method == 'GET':
-        return render_template('./subscribe_coscup.html')
+        user_count = SubscriberDB().count_documents({'status': True})
+        return render_template('./subscribe_coscup.html', user_count=user_count)
 
     elif request.method == 'POST':
         if not request.form['iamok']:

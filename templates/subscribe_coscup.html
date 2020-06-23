@@ -26,7 +26,7 @@
 <section class="section">
     <div class="container">
         <div class="columns">
-            <div class="column is-half is-offset-one-quarter">
+            <div id="subscribe" class="column is-half is-offset-one-quarter">
                 <div class="content">
                     <h4>使用範圍 / Agreememt</h4>
                     <p>訂閱只會收到 COSCUP 活動期間的訊息通知。在訂閱後會有確認信與取消訂閱的方式說明。如有其他問題詢問，可以寄信到 <a href="mailto:attentee@coscup.org">attentee@coscup.org</a>.</p>
@@ -59,12 +59,18 @@
                             <div class="h-captcha" data-sitekey="b281a373-2fc9-4359-9e15-ce908cd2a64c"></div>
                         </div>
                     </div>
-                    <div class="field">
+                    <div class="field has-addons">
                         <div class="control">
                             <button class="button is-outlined is-dark">
                                 <span class="icon"><i class="far fa-paper-plane"></i></span>
                                 <span>訂閱 / Subscribe</span>
                             </button>
+                        </div>
+                        <div class="control">
+                            <a class="button is-outlined is-info" v-on:click="add">
+                                <span class="icon"><i class="fas fa-at"></i></span>
+                                <span>{{user_count}} <strong>+[[ userCount ]]</strong> subscribers</span>
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -75,4 +81,28 @@
 {% endblock %}
 {% block js %}
 <script src="https://hcaptcha.com/1/api.js" async defer></script>
+<script>
+    (function() {
+        let $subscribe = new Vue({
+            el: '#subscribe',
+            data: {
+                userCount: 1
+            },
+            methods: {
+                add: function() {
+                    this.userCount = this.userCount + 1;
+                    console.log('%c   _____ ____   _____  _____ _    _ _____  ', 'color: #bada55');
+                    console.log('%c  / ____/ __ \\ / ____|/ ____| |  | |  __ \\ ', 'color: #bada55');
+                    console.log('%c | |   | |  | | (___ | |    | |  | | |__) |', 'color: #bada55');
+                    console.log('%c | |   | |  | |\\___ \\| |    | |  | |  ___/ ', 'color: #bada55');
+                    console.log('%c | |___| |__| |____) | |____| |__| | |     ', 'color: #bada55');
+                    console.log('%c  \\_____\\____/|_____/ \\_____|\\____/|_|     ', 'color: #bada55');
+                    console.log('%c Find volunteer opportunities, please join COSCUP => https://volunteer.coscup.org/', 'color: #bada55');
+                    console.log('%c 想要一起辦 COSCUP 嗎？快點加入我們！！COSCUP => https://volunteer.coscup.org/', 'color: #bada55');
+                }
+            },
+            delimiters: ['[[', ']]']
+        });
+    })();
+</script>
 {% endblock %}
