@@ -11,6 +11,7 @@ from flask import request
 from celery_task.task_mail_sys import mail_verify_mail
 from models.subscriberdb import SubscriberDB
 from module.subscriber import Subscriber
+from module.utils import hmac_encode
 
 VIEW_ADMIN_SUBSCRIBER = Blueprint('admin_subscriber', __name__, url_prefix='/admin/subscriber')
 
@@ -82,18 +83,30 @@ def dl():
     ''' name, mails[-1] '''
     with io.StringIO() as files:
         csv_writer = csv.writer(files, quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writerow(('name', 'mail', 'status', 'verified_email', 'ucode', 'admin_link'))
+        csv_writer.writerow(('name', 'mail', 'status', 'verified_email', 'admin_link', 'ucode', 'args', 'openhash'))
+
+        has_open_hash = False
+        if 't' in request.args and request.args['t']:
+            has_open_hash = True
 
         for data in SubscriberDB().find({'status': True}, {'_id': 1}):
             user = Subscriber(mail=data['_id'])
-            csv_writer.writerow((
+            row = [
                     user.data['name'],
                     user.data['mails'][-1],
                     int(user.data['status']),
                     int(user.data['verified_email']),
-                    user.data['ucode'],
                     user.render_admin_code(),
-                ))
+                    user.data['ucode'],
+                ]
+
+            if has_open_hash:
+                hash_str, args_str = hmac_encode(code=user.data['code'], data=request.args)
+                row.extend((args_str, hash_str))
+            else:
+                row.extend(('', ''))
+
+            csv_writer.writerow(row)
 
         filename = 'coscup_paper_subscribers_%s.csv' % datetime.now().strftime('%Y%m%d_%H%M%S')
 

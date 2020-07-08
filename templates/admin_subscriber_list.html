@@ -206,7 +206,9 @@
                     let btn = $e.target;
                     btn.classList.add('is-loading');
 
-                    axios({url: './list/dl', method: 'GET', responseType: 'text'}).then(function(resp) {
+                    let args = window.prompt("args: t=?", "");
+
+                    axios({url: './list/dl?'+args, method: 'GET', responseType: 'text'}).then(function(resp) {
                         window.URL = window.webkitURL || window.URL;
                         let link = document.createElement('a');
 
