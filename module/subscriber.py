@@ -8,6 +8,7 @@ from pymongo.collection import ReturnDocument
 
 from models.subscriberdb import SubscriberDB
 from models.subscriberdb import SubscriberLoginTokenDB
+from models.subscriberdb import SubscriberReadDB
 
 
 class Subscriber(object):
@@ -159,3 +160,25 @@ class Subscriber(object):
         m.update(data.encode('utf8'))
 
         return m.hexdigest()
+
+
+class SubscriberRead(object):
+    ''' SubscriberRead object '''
+    @staticmethod
+    def add(ucode, topic, headers, args=None):
+        ''' add record
+
+        :param str ucode: ucode
+        :param str topic: topic
+        :param dict headers: headers
+        :param str args: args
+
+        '''
+        data = SubscriberReadDB.default(
+                ucode=ucode.strip(),
+                topic=topic.strip(),
+                headers=dict(headers),
+                args=args,
+            )
+
+        SubscriberReadDB().insert_one(data)

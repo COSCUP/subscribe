@@ -33,6 +33,7 @@ class SubscriberLoginTokenDB(DBBase):
         ''' index '''
         self.create_index([('created_at', -1), ])
 
+    @staticmethod
     def default(token, uni_mail, _type):
         ''' default data
 
@@ -43,5 +44,29 @@ class SubscriberLoginTokenDB(DBBase):
             '_id': token,
             'uni_mail': uni_mail,
             '_type': _type,
+            'created_at': datetime.now(),
+        }
+
+
+class SubscriberReadDB(DBBase):
+    ''' SubscriberReadDB collection '''
+    def __init__(self):
+        super(SubscriberReadDB, self).__init__('subscriber_read')
+
+    @staticmethod
+    def default(ucode, topic, headers, args=None):
+        ''' default data
+
+        :param str ucode: ucode
+        :param str topic: topic
+        :param dict headers: headers
+        :param str args: args
+
+        '''
+        return {
+            'ucode': ucode,
+            'topic': topic,
+            'headers': headers,
+            'args': args,
             'created_at': datetime.now(),
         }
