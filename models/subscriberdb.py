@@ -17,6 +17,7 @@ class SubscriberDB(DBBase):
             'name': name,
             'mails': mails,
             'code': '%0.8x' % uuid4().fields[0],
+            'ucode': '%0.8x' % uuid4().fields[0],
             'status': True,
             'verified_email': False,
             'created_at': datetime.now(),

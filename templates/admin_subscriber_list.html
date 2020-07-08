@@ -51,7 +51,7 @@
                 <thead>
                     <tr>
                         <th>index</th>
-                        <th v-on:click="sort_('code')">code</th>
+                        <th v-on:click="sort_('ucode')">ucode/code</th>
                         <th v-on:click="sort_('status')">status</th>
                         <th v-on:click="sort_('verified_email')">verify</th>
                         <th v-on:click="sort_('_id')">uni mail</th>
@@ -64,7 +64,10 @@
                 <tbody>
                     <tr v-for="(data, index) in datas">
                         <td style="vertical-align:middle;">[[ index+1 ]].</td>
-                        <td style="vertical-align:middle;"><span class="tag is-family-monospace">[[ data.code ]]</span></td>
+                        <td style="vertical-align:middle;">
+                            <span class="tag is-family-monospace">[[ data.ucode ]]</span>
+                            <span class="tag is-family-monospace">[[ data.code ]]</span>
+                        </td>
                         <td style="vertical-align:middle;">
                             <a class="button is-outlined"
                                 v-on:click="changestatus(data, $event)">

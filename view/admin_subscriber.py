@@ -53,6 +53,7 @@ def lists():
                 datas.append({
                     '_id': data['_id'],
                     'code': data['code'],
+                    'ucode': data['ucode'],
                     'name': data['name'],
                     'mails': data['mails'],
                     'created_at': data['created_at'],
@@ -81,7 +82,7 @@ def dl():
     ''' name, mails[-1] '''
     with io.StringIO() as files:
         csv_writer = csv.writer(files, quoting=csv.QUOTE_MINIMAL)
-        csv_writer.writerow(('name', 'mail', 'status', 'verified_email', 'admin_link'))
+        csv_writer.writerow(('name', 'mail', 'status', 'verified_email', 'ucode', 'admin_link'))
 
         for data in SubscriberDB().find({'status': True}, {'_id': 1}):
             user = Subscriber(mail=data['_id'])
@@ -90,6 +91,7 @@ def dl():
                     user.data['mails'][-1],
                     int(user.data['status']),
                     int(user.data['verified_email']),
+                    user.data['ucode'],
                     user.render_admin_code(),
                 ))
 
