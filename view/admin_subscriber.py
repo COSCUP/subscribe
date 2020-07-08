@@ -83,7 +83,7 @@ def dl():
         csv_writer = csv.writer(files, quoting=csv.QUOTE_MINIMAL)
         csv_writer.writerow(('name', 'mail', 'status', 'verified_email', 'admin_link'))
 
-        for data in SubscriberDB().find({}, {'_id': 1}):
+        for data in SubscriberDB().find({'status': True}, {'_id': 1}):
             user = Subscriber(mail=data['_id'])
             csv_writer.writerow((
                     user.data['name'],
