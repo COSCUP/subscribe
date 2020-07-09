@@ -53,6 +53,11 @@ class SubscriberReadDB(DBBase):
     def __init__(self):
         super(SubscriberReadDB, self).__init__('subscriber_read')
 
+    def index(self):
+        ''' index '''
+        self.create_index([('created_at', -1), ])
+        self.create_index([('topic', 1), ])
+
     @staticmethod
     def default(ucode, topic, headers, args=None):
         ''' default data

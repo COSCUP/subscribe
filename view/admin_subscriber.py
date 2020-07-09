@@ -10,6 +10,7 @@ from flask import request
 
 from celery_task.task_mail_sys import mail_verify_mail
 from models.subscriberdb import SubscriberDB
+from models.subscriberdb import SubscriberReadDB
 from module.subscriber import Subscriber
 from module.utils import hmac_encode
 
@@ -116,3 +117,33 @@ def dl():
                 headers={'Content-disposition': 'attachment; filename=%s' % filename,
                          'x-filename': filename,
                 })
+
+@VIEW_ADMIN_SUBSCRIBER.route('/open', methods=('GET', 'POST'))
+def open_rate():
+    if request.method == 'GET':
+        return render_template('./admin_subscriber_open.html')
+    elif request.method == 'POST':
+        post_data = request.get_json()
+
+        if post_data['casename'] == 'topics':
+            topics = SubscriberReadDB().distinct('topic')
+
+            return jsonify({'topics': topics})
+
+        elif post_data['casename'] == 'get':
+            datas = []
+            for raw in SubscriberReadDB().find(
+                    {'topic': post_data['topic']},
+                    sort=(('created_at', -1), ),
+                ):
+                datas.append({
+                    '_id': str(raw['_id']),
+                    'created_at': raw['created_at'],
+                    'ucode': raw['ucode'],
+                    'headers': {'User-Agent': raw['headers']['User-Agent'],
+                                'X-Real-Ip': raw['headers']['X-Real-Ip'], },
+                })
+
+            return jsonify({'datas': datas})
+
+        return jsonify({})

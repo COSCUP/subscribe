@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{%block head_title%}Subscriber List - {%endblock%}
+{% block body %}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                開信統計
+            </h1>
+            <h2 class="subtitle">
+                Subscriber Open
+            </h2>
+        </div>
+    </div>
+    <div class="hero-foot">
+        <nav class="tabs is-boxed">
+            <div class="container">
+                <ul>
+                    <li class="is-active"><a href="./">返回</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</section>
+<section class="section">
+    <div class="container" id="subscribeopen" v-cloak>
+        <div class="field is-grouped">
+            <div class="control">
+                <div class="field">
+                    <div class="control">
+                        <button class="button">共 [[ datas.length ]] 筆</button>
+                        <button class="button" @click="cal" :disabled="datas.length == 0">計算</button>
+                    </div>
+                </div>
+            </div>
+            <div class="control">
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <div class="select">
+                            <select v-model="select_topic">
+                                <option value="" disabled>選擇 topic</option>
+                                <option v-for="topic in topics" :value="topic">[[topic]]</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control">
+                        <a class="button" @click="read_topic($event)">讀取</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-container" v-if="map_ucode.size">
+            <table class="table is-narrow is-striped">
+                <caption>Users</caption>
+                <thead>
+                    <tr>
+                        <th>ucode</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="raw in map_ucode.entries()">
+                        <td>[[raw[0] ]]</td>
+                        <td class="has-text-right is-family-monospace">[[raw[1] ]]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-container" v-if="map_ip.size">
+            <table class="table is-narrow is-striped">
+                <caption>IPs</caption>
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="raw in map_ip.entries()">
+                        <td>[[raw[0] ]]</td>
+                        <td class="has-text-right is-family-monospace">[[raw[1] ]]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-container" v-if="map_useragent.size">
+            <table class="table is-narrow is-striped">
+                <caption>User-Agent</caption>
+                <thead>
+                    <tr>
+                        <th>User-Agent</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="raw in map_useragent.entries()">
+                        <td>[[raw[0] ]]</td>
+                        <td class="has-text-right is-family-monospace">[[raw[1] ]]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-container" v-if="datas.length">
+            <table class="table is-narrow is-striped">
+                <caption>Logs</caption>
+                <thead>
+                    <tr>
+                        <th>index</th>
+                        <th>date</th>
+                        <th>ucode</th>
+                        <th>IP</th>
+                        <th>User-Agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(data, index) in datas">
+                        <td style="vertical-align:middle;">[[ index+1 ]].</td>
+                        <td>
+                            <p>[[ new Date(data.created_at).toLocaleString() ]]</p>
+                        </td>
+                        <td>
+                            <p>[[data.ucode ]]</p>
+                        </td>
+                        <td>
+                            <p>[[data.headers['X-Real-Ip'] ]]</p>
+                        </td>
+                        <td>
+                            <p>[[data.headers['User-Agent'] ]]</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block js %}
+<script src="/js/axios.min.js"></script>
+<script>
+    (function() {
+        let $subscribeopen = new Vue({
+            el: '#subscribeopen',
+            data: {
+                datas: [],
+                topics: [],
+                select_topic: '',
+                map_ip: new Map(),
+                map_ucode: new Map(),
+                map_useragent: new Map()
+            },
+            mounted: function() {
+                this.load_topics();
+            },
+            methods: {
+                load_topics: function() {
+                    axios.post('./open', {casename: 'topics'}).then(function(resp) {
+                        $subscribeopen.topics = resp.data.topics;
+                    });
+                },
+                read_topic: function($e) {
+                    axios.post('./open', {casename: 'get', topic: this.select_topic}).then(function(resp) {
+                        $subscribeopen.datas = resp.data.datas;
+                    });
+                },
+                cal: function() {
+                    $subscribeopen.map_count($subscribeopen.map_ip, function(raw){return raw.headers['X-Real-Ip'];});
+                    $subscribeopen.map_count($subscribeopen.map_ucode, function(raw){return raw.ucode;});
+                    $subscribeopen.map_count($subscribeopen.map_useragent, function(raw){return raw.headers['User-Agent'];});
+                    this.$forceUpdate();
+                },
+                map_count: function($this, getkey) {
+                    $this.clear();
+                    this.datas.forEach(function(raw) {
+                        let key = getkey(raw);
+                        if ($this.has(key) === false) {
+                            $this.set(key, 0)
+                        }
+                        $this.set(key, $this.get(key)+1);
+                    });
+                }
+            },
+            delimiters: ['[[', ']]']
+        });
+    })();
+</script>
+{% endblock %}
