@@ -54,12 +54,14 @@
                 <caption>Users</caption>
                 <thead>
                     <tr>
+                        <th>index</th>
                         <th>ucode</th>
                         <th>Count</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="raw in map_ucode.entries()">
+                    <tr v-for="(raw, index) in map_ucode.entries()">
+                        <td>[[ index+1 ]].</td>
                         <td>[[raw[0] ]]</td>
                         <td class="has-text-right is-family-monospace">[[raw[1] ]]</td>
                     </tr>
