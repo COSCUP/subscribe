@@ -7,4 +7,5 @@ docker run \
            --log-opt max-file=1 \
            -v $(pwd)/scripts:/app/scripts \
            -e PYTHONPATH=/app \
+           -e LD_PRELOAD=/usr/local/lib/libjemalloc.so \
            secretary-app:prod sh
