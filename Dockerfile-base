@@ -1,4 +1,4 @@
-FROM alpine:3.12.3
+FROM alpine:3.13.5
 
 WORKDIR /app
 ADD ./requirements.txt ./requirements.txt

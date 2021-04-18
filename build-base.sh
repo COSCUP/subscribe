@@ -1,1 +1,1 @@
-docker build --no-cache=true -t secretary-base:20.12.24 -f ./Dockerfile-base ./
+docker build --no-cache=true -t secretary-base:21.04.18 -f ./Dockerfile-base ./
