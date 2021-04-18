@@ -30,6 +30,7 @@ from view.admin_subscriber import VIEW_ADMIN_SUBSCRIBER
 from view.reader import VIEW_READER
 from view.subscribe import VIEW_SUBSCRIBE
 from view.subscriber import VIEW_SUBSCRIBER
+from view.trello import VIEW_TRELLO
 
 
 app = Flask(__name__)
@@ -39,6 +40,7 @@ app.register_blueprint(VIEW_ADMIN_SUBSCRIBER)
 app.register_blueprint(VIEW_READER)
 app.register_blueprint(VIEW_SUBSCRIBE)
 app.register_blueprint(VIEW_SUBSCRIBER)
+app.register_blueprint(VIEW_TRELLO)
 
 
 NO_NEED_LOGIN_PATH = (
@@ -60,6 +62,7 @@ def need_login():
     if request.path not in NO_NEED_LOGIN_PATH \
             and not request.path.startswith('/subscriber') \
             and not request.path.startswith('/subscribe') \
+            and not request.path.startswith('/trello') \
             and not request.path.startswith('/r/'):
         if not session.get('u'):
             session['r'] = request.path
@@ -165,3 +168,4 @@ got_request_exception.connect(error_exception, app)
 
 if __name__ == '__main__':
     app.run(debug=False, host=setting.SERVER_HOST, port=setting.SERVER_PORT)
+
