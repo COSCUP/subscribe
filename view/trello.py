@@ -82,6 +82,7 @@ def index():
         requests.post(
                 setting.TRELLO_HOOK,
                 json={
+                        'text': '%s | %s' % (_action['display']['entities']['memberCreator']['text'], title),
                         'icon_emoji': ':space_invader:',
                         'attachments': [{
                                 'text': wording, 'color': color, 'title': title, 'title_link': title_link,
