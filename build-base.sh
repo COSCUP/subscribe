@@ -1,1 +1,1 @@
-docker build --no-cache=true -t secretary-base:21.04.18 -f ./Dockerfile-base ./
+docker build --no-cache=true -t coscupweb-base:21.07.08 -f ./Dockerfile-base ./

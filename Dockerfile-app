@@ -1,4 +1,4 @@
-FROM secretary-base:21.04.18
+FROM coscupweb-base:21.07.08
 
 ADD ./client_secret.json ./client_secret.json
 ADD ./celery_task ./celery_task
