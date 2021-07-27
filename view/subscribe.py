@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import requests
 from flask import Blueprint
@@ -9,6 +10,7 @@ from flask import session
 from flask import url_for
 
 import setting
+from celery_task.task_ga import ga_subscribe
 from celery_task.task_mail_sys import mail_verify_mail
 from models.subscriberdb import SubscriberDB
 from module.subscriber import Subscriber
@@ -55,6 +57,12 @@ def coscup():
 
         session['show_info'] = ('007', )
         session['status_code'] = 200
+
+        ga_subscribe.apply_async(kwargs={
+                'ucode': user.data['ucode'],
+                'timestamp_micros': int(datetime.now().timestamp()*1000000),
+            })
+
         return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
     return u''

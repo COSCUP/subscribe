@@ -15,12 +15,14 @@ app = Celery(
     broker='amqp://%s' % setting.RABBITMQ,
     include=(
         'celery_task.task_mail_sys',
+        'celery_task.task_ga',
     ),
 )
 
 app.conf.task_queues = (
     Queue('celery', Exchange('celery', type='direct'), routing_key='celery'),
     Queue('CST_mail', Exchange('COSCUP-SECRETARY-TEAM', type='topic'), routing_key='cst.mail.#'),
+    Queue('CST_ga', Exchange('COSCUP-SECRETARY-TEAM', type='topic'), routing_key='cst.ga.#'),
 )
 
 app.conf.acks_late = True

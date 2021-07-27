@@ -1,8 +1,11 @@
 import logging
+from datetime import datetime
 
 from flask import Blueprint
 from flask import request
 
+import setting
+from celery_task.task_ga import ga_reader
 from models.subscriberdb import SubscriberDB
 from module.subscriber import SubscriberRead
 from module.utils import hmac_encode
@@ -32,5 +35,11 @@ def read_page(ucode, hash_str):
                 headers=request.headers,
                 args=query,
             )
+
+        ga_reader.apply_async(kwargs={
+                'ucode': ucode,
+                'topic': request.args['t'],
+                'timestamp_micros': int(datetime.now().timestamp()*1000000),
+            })
 
     return u'', 404
