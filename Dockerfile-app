@@ -1,10 +1,11 @@
-FROM coscupweb-base:21.07.08
+FROM coscupweb-base:21.10.03
 
-ADD ./client_secret.json ./client_secret.json
 ADD ./celery_task ./celery_task
+ADD ./client_secret.json ./client_secret.json
 ADD ./main.py ./main.py
 ADD ./models ./models
 ADD ./module ./module
 ADD ./setting.py ./setting.py
 ADD ./templates ./templates
+ADD ./uwsgi.ini ./uwsgi.ini
 ADD ./view ./view
