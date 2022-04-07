@@ -6,8 +6,13 @@ from models.base import DBBase
 
 class SubscriberDB(DBBase):
     ''' SubscriberDB collection '''
+
     def __init__(self):
         super(SubscriberDB, self).__init__('subscriber')
+
+    def index(self):
+        ''' index '''
+        self.create_index([('status', 1), ])
 
     @staticmethod
     def default(uni_mail, name, mails):
@@ -26,6 +31,7 @@ class SubscriberDB(DBBase):
 
 class SubscriberLoginTokenDB(DBBase):
     ''' SubscriberLoginTokenDB collection '''
+
     def __init__(self):
         super(SubscriberLoginTokenDB, self).__init__('subscriber_login_token')
 
@@ -50,6 +56,7 @@ class SubscriberLoginTokenDB(DBBase):
 
 class SubscriberReadDB(DBBase):
     ''' SubscriberReadDB collection '''
+
     def __init__(self):
         super(SubscriberReadDB, self).__init__('subscriber_read')
 
