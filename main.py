@@ -29,6 +29,8 @@ logging.basicConfig(
 
 
 app = Flask(__name__)
+app.config['SESSION_COOKIE_NAME'] = '__Host-ss'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = setting.SECRET_KEY
 app.register_blueprint(VIEW_ADMIN_SUBSCRIBER)
