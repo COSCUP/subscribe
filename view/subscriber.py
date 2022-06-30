@@ -136,6 +136,8 @@ def verify_mail(code):
         session['status_code'] = 200
         return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
+    return ''
+
 @VIEW_SUBSCRIBER.route('/intro', methods=('GET', 'POST'))
 def intro():
     if 's_login_token' not in session:
