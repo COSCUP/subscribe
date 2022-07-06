@@ -70,6 +70,22 @@ def need_login():
 
 
 @app.after_request
+def cors_header(response):
+    ''' CORS setting '''
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+
+    origin = request.headers.get('Origin')
+    if origin:
+        response.headers.add('Access-Control-Allow-Origin', origin)
+
+    if request.method == 'OPTIONS':
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+
+    return response
+
+
+@app.after_request
 def no_store(response):
     ''' return no-store '''
     if session.get('u'):
