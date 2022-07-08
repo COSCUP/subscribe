@@ -82,3 +82,10 @@ class SubscriberReadDB(DBBase):
             'args': args,
             'created_at': datetime.now(),
         }
+
+
+class OPassLogsDB(DBBase):
+    ''' OPassLogsDB '''
+
+    def __init__(self):
+        super(OPassLogsDB, self).__init__('subscriber_opass_logs')

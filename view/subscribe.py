@@ -8,7 +8,7 @@ from flask import (Blueprint, jsonify, redirect, render_template, request,
 import setting
 from celery_task.task_ga import ga_subscribe
 from celery_task.task_mail_sys import mail_verify_mail
-from models.subscriberdb import SubscriberDB
+from models.subscriberdb import OPassLogsDB, SubscriberDB
 from module.subscriber import Subscriber
 
 VIEW_SUBSCRIBE = Blueprint('subscribe', __name__, url_prefix='/subscribe')
@@ -46,13 +46,29 @@ def coscup_opass():
         if not resp['success']:
             return jsonify({'error-codes': resp.get('error-codes')}), 400
 
-        process_subscribe(mail=request.form['mail'], name=request.form['name'])
+        if not 'onlytoken' in request.form:
+            process_subscribe(
+                mail=request.form['mail'].strip(), name=request.form['name'].strip())
 
-        opass_resp = request.post('https://ccip.opass.app/import',
-                                  data={'name': request.form['name'].strip()}
-                                  ).json()
+        opass_resp = requests.post('https://ccip.opass.app/import',
+                                   data={'name': request.form['name'].strip()}
+                                   ).json()
 
         logging.info('[opass] token: %s', opass_resp)
+
+        log_data = {
+            'name': request.form['name'].strip(),
+            'mail': '',
+            'opass_resp': opass_resp,
+            'hcaptcha': resp,
+            'remoteip': request.headers.get('X-REAL-IP'),
+            'create_at': datetime.now(),
+        }
+
+        if not 'onlytoken' in request.form:
+            log_data['mail'] = request.form['mail'].strip()
+
+        OPassLogsDB().insert_one(log_data)
 
         return jsonify(opass_resp)
 
