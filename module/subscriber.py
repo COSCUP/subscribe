@@ -4,9 +4,11 @@ from datetime import datetime
 from time import time
 from uuid import uuid4
 
+from pymongo.collection import ReturnDocument
+
 from models.subscriberdb import (SubscriberDB, SubscriberLoginTokenDB,
                                  SubscriberReadDB)
-from pymongo.collection import ReturnDocument
+from module.utils import hmac_encode
 
 
 class Subscriber(object):
@@ -185,3 +187,36 @@ class SubscriberRead(object):
         )
 
         SubscriberReadDB().insert_one(data)
+
+
+class GenLists:
+    ''' GenLists '''
+    @staticmethod
+    def dumps(request_args, need_id=False):
+        ''' dumps '''
+        has_open_hash = False
+        if 't' in request_args and request_args['t']:
+            has_open_hash = True
+
+            for data in SubscriberDB().find({'status': True}, {'_id': 1}):
+                user = Subscriber(mail=data['_id'])
+                # ('name', 'mail', 'status', 'verified_email', 'admin_link', 'ucode', 'args', 'openhash')
+                row = {
+                    'name': user.data['name'],
+                    'mail': user.data['mails'][-1],
+                    'status': int(user.data['status']),
+                    'verified_email': int(user.data['verified_email']),
+                    'admin_link': user.render_admin_code(),
+                    'ucode': user.data['ucode'],
+                    'args': '',
+                    'openhash': '',
+                }
+
+                if has_open_hash:
+                    row['openhash'], row['args'] = hmac_encode(
+                        code=user.data['code'], data=request_args)
+
+                if need_id:
+                    row['_id'] = data['_id']
+
+                yield row
