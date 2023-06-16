@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "coscupsecretary2020"
+version = "23.07.01"
+description = ""
+authors = ["Toomore Chiang <toomore0929@gmail.com>"]
+license = "AGPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+google-api-python-client = "^2.89.0"
+google-auth = "^2.20.0"
+google-auth-httplib2 = "^0.1.0"
+google-auth-oauthlib = "^1.0.0"
+arrow = "^1.2.3"
+blinker = "^1.6.2"
+boto3 = "^1.26.154"
+celery = "<6"
+Flask = "^2.3.2"
+Markdown = "^3.4.3"
+phonenumbers = "^8.13.14"
+pylibmc = "^1.6.3"
+pymongo = "^4.3.3"
+requests = "^2.31.0"
+uWSGI = "^2.0.21"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
