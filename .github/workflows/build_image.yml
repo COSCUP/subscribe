@@ -22,6 +22,8 @@ jobs:
         run: docker images
       - name: Rename sample setting file
         run: mv ./setting_sample.py ./setting.py
+      - name: Add fake client secret
+        run: touch ./client_secret.json
       - name: Build app
         run: docker build --no-cache=true -t secretary-app:prod -f ./Dockerfile-app ./
       - name: List images
