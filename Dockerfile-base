@@ -1,7 +1,8 @@
 FROM alpine:3.17.2
 
 WORKDIR /app
-ADD ./requirements.txt ./requirements.txt
+ADD pyproject.toml poetry.lock ./
+ENV PATH="/root/.local/bin:${PATH}"
 RUN \
         apk update && apk upgrade                                   && \
         apk add --no-cache python3 ca-certificates libmemcached-dev && \
@@ -13,5 +14,6 @@ RUN \
         curl -sSL https://install.python-poetry.org | python3 -     && \
         poetry install --only main                                  && \
         apk del .build-deps                                         && \
+        cd ~/.cache/ && \
         find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete && \
         rm -rf /var/cache/apk/* /var/lib/apk/* /etc/apk/cache/*
