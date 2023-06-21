@@ -3,16 +3,15 @@ FROM alpine:3.17.2
 WORKDIR /app
 ADD ./requirements.txt ./requirements.txt
 RUN \
-  apk update && apk upgrade                                   && \
-  apk add --no-cache python3 ca-certificates libmemcached-dev && \
-  apk add --no-cache --virtual .build-deps curl cmake zlib-dev   \
-          g++ make gcc musl-dev python3-dev libffi-dev openssl-dev && \
-  wget https://github.com/jemalloc/jemalloc/releases/download/5.3.0/jemalloc-5.3.0.tar.bz2 && \
-  tar xvjf jemalloc-5.3.0.tar.bz2 && cd jemalloc-5.3.0 && ./configure && make && make install && \
-  cd ../ && rm -rf ./jemalloc* && \
-  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py     && \
-  python3 get-pip.py                                          && \
-  rm get-pip.py                                               && \
-  pip install -r ./requirements.txt                           && \
-  apk del .build-deps                                         && \
-  rm -rf /var/cache/apk/* /var/lib/apk/* /etc/apk/cache/*
+        apk update && apk upgrade                                   && \
+        apk add --no-cache python3 ca-certificates libmemcached-dev && \
+        apk add --no-cache --virtual .build-deps curl cmake zlib-dev   \
+        g++ make gcc musl-dev python3-dev libffi-dev openssl-dev && \
+        wget https://github.com/jemalloc/jemalloc/releases/download/5.3.0/jemalloc-5.3.0.tar.bz2 && \
+        tar xvjf jemalloc-5.3.0.tar.bz2 && cd jemalloc-5.3.0 && ./configure && make && make install && \
+        cd ../ && rm -rf ./jemalloc* && \
+        curl -sSL https://install.python-poetry.org | python3 -     && \
+        poetry install --only main                                  && \
+        apk del .build-deps                                         && \
+        find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete && \
+        rm -rf /var/cache/apk/* /var/lib/apk/* /etc/apk/cache/*

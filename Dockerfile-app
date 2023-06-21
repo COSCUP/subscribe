@@ -1,11 +1,52 @@
-FROM secretaryweb-base:23.02.15
+FROM secretaryweb-base:23.06.25
 
-ADD ./celery_task ./celery_task
 ADD ./client_secret.json ./client_secret.json
 ADD ./main.py ./main.py
-ADD ./models ./models
-ADD ./module ./module
 ADD ./setting.py ./setting.py
-ADD ./templates ./templates
 ADD ./uwsgi.ini ./uwsgi.ini
-ADD ./view ./view
+
+ADD ./celery_task/__init__.py \
+    ./celery_task/celery.py \
+    ./celery_task/task_ga.py \
+    ./celery_task/task_mail_sys.py \
+    ./celery_task/
+
+ADD ./models/__init__.py \
+    ./models/base.py \
+    ./models/index.py \
+    ./models/subscriberdb.py \
+    ./models/
+
+ADD ./module/__init__.py \
+    ./module/awsses.py \
+    ./module/ga.py \
+    ./module/sender.py \
+    ./module/subscriber.py \
+    ./module/utils.py \
+    ./module/
+
+ADD ./templates/mail/coscup_base.html \
+    ./templates/mail/coscup_subscribe_login_code.html \
+    ./templates/mail/coscup_subscribe_verify_mail.html \
+    ./templates/mail/
+
+ADD ./templates/admin_subscriber_add.html \
+    ./templates/admin_subscriber_list.html \
+    ./templates/admin_subscriber_open.html \
+    ./templates/admin_subscriber.html \
+    ./templates/base_subscribe.html \
+    ./templates/base.html templates/index.html \
+    ./templates/subscribe_coscup.html \
+    ./templates/subscriber_error.html \
+    ./templates/subscriber_intro.html \
+    ./templates/subscriber_verify_mail.html \
+    ./templates/subscriber.html \
+    ./templates/
+
+ADD ./view/__init__.py \
+    ./view/admin_subscriber.py \
+    ./view/reader.py \
+    ./view/subscribe.py \
+    ./view/subscriber.py \
+    ./view/trello.py \
+    ./view/
