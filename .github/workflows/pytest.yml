@@ -1,0 +1,52 @@
+name: PyLint
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  run_test:
+    strategy:
+      matrix:
+        os: ["ubuntu-20.04"]
+        python-version: ["3.11", "3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache Poetry venv
+        uses: actions/cache@v3
+        with:
+          path: ./.venv
+          key: poetry-venv-${{ matrix.python-version }}${{ hashFiles('**/poetry.lock') }}
+      - name: Cache Poetry local
+        uses: actions/cache@v3
+        with:
+          path: ~/.local/share/pypoetry
+          key: poetry-local-${{ matrix.python-version }}${{ hashFiles('**/poetry.lock') }}
+      - name: Cache Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ matrix.python-version }}${{ hashFiles('**/poetry.lock') }}
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      - name: Install dependencies
+        run: poetry install -v
+      - name: Show packages
+        run: poetry show --tree
+      - name: Create setting.py
+        run: mv setting_sample.py setting.py
+      - name: Run mypy
+        run: PYTHONPATH=./ poetry run mypy ./view/ ./module/ ./models/ ./celery_task/ ./main.py
+      - name: Run Pylint
+        run: PYTHONPATH=./ poetry run pylint --disable=R0801,E1101,E0611 ./view/ ./module/ ./models/ ./celery_task/ ./main.py
