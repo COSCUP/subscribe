@@ -12,11 +12,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from os.path import basename
+from typing import Any
 
-import boto3
+import boto3  # type:ignore
 
 
-class AWSS3(object):
+class AWSS3():
     ''' AWSS3
 
     :param str aws_access_key_id: aws_access_key_id
@@ -26,14 +27,14 @@ class AWSS3(object):
     '''
     __slots__ = ('client', 'bucket')
 
-    def __init__(self, aws_access_key_id, aws_secret_access_key, bucket):
+    def __init__(self, aws_access_key_id: str, aws_secret_access_key: str, bucket: str):
         self.client = boto3.client('s3',
                                    aws_access_key_id=aws_access_key_id,
                                    aws_secret_access_key=aws_secret_access_key,
                                    )
         self.bucket = bucket
 
-    def get_object(self, key):
+    def get_object(self, key: str) -> Any:
         ''' Get object
 
         :param str key: key name
@@ -45,22 +46,23 @@ class AWSS3(object):
         '''
         return self.client.get_object(Bucket=self.bucket, Key=key)
 
-    def convert_to_attachment(self, key):
+    def convert_to_attachment(self, key: str) -> MIMEBase:
+        ''' Convert s3 object to attachment '''
         s3object = self.get_object(key)
         attachment = MIMEBase(
             s3object['ContentType'].split('/')[0],
-            '%s; name="%s"' % (s3object['ContentType'].split(
-                '/')[1], Charset('utf-8').header_encode(basename(key)))
+            f'''{s3object['ContentType'].split('/')[1]}; name="{Charset('utf-8').header_encode(basename(key))}"'''  # pylint: disable=line-too-long
         )
-        attachment.add_header('Content-Disposition', 'attachment; filename="%s"' %
-                              Charset('utf-8').header_encode(basename(key)))
+        attachment.add_header(
+            'Content-Disposition',
+            f'''attachment; filename="{Charset('utf-8').header_encode(basename(key))}"''')
         attachment.set_payload(s3object['Body'].read())
         encoders.encode_base64(attachment)
 
         return attachment
 
 
-class AWSSES(object):
+class AWSSES():
     ''' AWSSES
 
     :param str aws_access_key_id: aws_access_key_id
@@ -71,7 +73,7 @@ class AWSSES(object):
 
     __slots__ = ('client', 'source')
 
-    def __init__(self, aws_access_key_id, aws_secret_access_key, source):
+    def __init__(self, aws_access_key_id: str, aws_secret_access_key: str, source: dict[str, str]):
         self.client = boto3.client('ses',
                                    aws_access_key_id=aws_access_key_id,
                                    aws_secret_access_key=aws_secret_access_key,
@@ -79,7 +81,7 @@ class AWSSES(object):
         self.source = source
 
     @staticmethod
-    def format_mail(name, mail):
+    def format_mail(name: str, mail: str) -> str:
         ''' Encode header to base64
 
             :param str name: user name
@@ -92,7 +94,7 @@ class AWSSES(object):
 
         return mail
 
-    def send_email(self, *args, **kwargs):
+    def send_email(self, *args: Any, **kwargs: Any) -> Any:
         ''' Send mail
 
         ``*args``, ``**kwargs`` are the same with :meth:`SES.Client.send_email`
@@ -103,7 +105,7 @@ class AWSSES(object):
         '''
         return self.client.send_email(*args, **kwargs)
 
-    def raw_mail(self, **kwargs):
+    def raw_mail(self, **kwargs: Any) -> Any:
         ''' To make raw mail content
 
         :param list to_addresses: to
@@ -121,14 +123,15 @@ class AWSSES(object):
             self.source['name'], self.source['mail'])
 
         to_list = []
-        for to in kwargs['to_addresses']:
-            to_list.append(self.format_mail(to['name'], to['mail']))
+        for to_user in kwargs['to_addresses']:
+            to_list.append(self.format_mail(to_user['name'], to_user['mail']))
         msg_all['To'] = ','.join(to_list)
 
         cc_list = []
         if 'cc_addresses' in kwargs and kwargs['cc_addresses']:
-            for cc in kwargs['cc_addresses']:
-                cc_list.append(self.format_mail(cc['name'], cc['mail']))
+            for cc_user in kwargs['cc_addresses']:
+                cc_list.append(self.format_mail(
+                    cc_user['name'], cc_user['mail']))
 
             if cc_list:
                 msg_all['Cc'] = ','.join(cc_list)
@@ -152,7 +155,7 @@ class AWSSES(object):
 
         return msg_all
 
-    def send_raw_email(self, **kwargs):
+    def send_raw_email(self, **kwargs: Any) -> Any:
         ''' send raw email
 
         if no ``data``, must have ``from``, ``to``, ``subject``, ``body``, ``attachment``
@@ -174,10 +177,7 @@ class AWSSES(object):
             return self.client.send_raw_email(
                 RawMessage={'Data': kwargs['data_str']})
 
-        if 'data' in kwargs:
-            data = kwargs['data']
-        else:
-            data = self.raw_mail(**kwargs)
+        data = kwargs.get('data', self.raw_mail(**kwargs))
 
         return self.client.send_raw_email(
             RawMessage={'Data': data.as_string()})

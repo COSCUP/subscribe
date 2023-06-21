@@ -60,6 +60,7 @@ strict_equality = true
 [[tool.mypy.overrides]]
 module = [
     'apiclient',
+    'celery.*',
     'celery_task.*',
     'google_auth_oauthlib.*',
     'kombu',

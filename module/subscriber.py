@@ -1,7 +1,9 @@
+''' subscriber '''
 import hashlib
 import re
 from datetime import datetime
 from time import time
+from typing import Any, Generator, Literal, Mapping, Optional, Self
 from uuid import uuid4
 
 from pymongo.collection import ReturnDocument
@@ -11,23 +13,25 @@ from models.subscriberdb import (SubscriberDB, SubscriberLoginTokenDB,
 from module.utils import hmac_encode
 
 
-class Subscriber(object):
+class Subscriber():
     '''Subscriber class
 
     :param str mail: get subscriber data from mail
 
     '''
 
-    def __init__(self, mail):
+    __slots__ = ('data', 'login_token_data')
+
+    def __init__(self, mail: str) -> None:
         mail = self.format_mail(mail)
-        self.data = SubscriberDB().find_one({'_id': mail})
-        self.login_token_data = {}
+        self.data = SubscriberDB().find_one({'_id': mail}) or {}
+        self.login_token_data: dict[str, str] = {}
 
-    def render_admin_code(self):
+    def render_admin_code(self) -> str:
         ''' render admin code for link '''
-        return self.shadata('%(code)s|%(_id)s' % self.data)
+        return self.shadata(f"{self.data['code']}|{self.data['_id']}")
 
-    def verify_admin_code(self, code):
+    def verify_admin_code(self, code: str) -> bool:
         ''' verify admin code
 
         :param str code: code
@@ -35,14 +39,14 @@ class Subscriber(object):
         '''
         return code == self.render_admin_code()
 
-    def make_login(self, _type):
+    def make_login(self, _type: str) -> Any:
         ''' make an login code
 
         :param str _type: code, token, verify_mail
 
         '''
         if _type not in ('code', 'token', 'verify_mail'):
-            raise Exception('type error')
+            raise TypeError('type error')
 
         token = self.shadata(str(uuid4()) + str(uuid4()))
 
@@ -51,7 +55,7 @@ class Subscriber(object):
 
         return SubscriberLoginTokenDB().insert_one(data).inserted_id
 
-    def update_date(self, data):
+    def update_date(self, data: dict[str, Any]) -> dict[str, Any]:
         ''' update data
 
         :param dict data: data
@@ -65,13 +69,13 @@ class Subscriber(object):
         return self.data
 
     @classmethod
-    def verify_login(cls, _type, code):
+    def verify_login(cls, _type: str, code: str) -> bool | Self:
         ''' verify login code
 
         :param str _type: code, token
 
         '''
-        query = {'_id': code, '_type': _type}
+        query: dict[str, Any] = {'_id': code, '_type': _type}
         if _type == 'code':
             query['created_at'] = {
                 '$gte': datetime.fromtimestamp(time() - 600)}
@@ -102,7 +106,7 @@ class Subscriber(object):
         return user
 
     @staticmethod
-    def make_code_disabled(code):
+    def make_code_disabled(code: str) -> None:
         ''' Make code disabled
 
         :param str code: code
@@ -112,7 +116,7 @@ class Subscriber(object):
             {'_id': code}, {'$set': {'disabled': True}})
 
     @classmethod
-    def process_upload(cls, mail, name):
+    def process_upload(cls, mail: str, name: str) -> Optional[tuple[str, str]]:
         '''process upload
 
         :param str mail: mail
@@ -123,7 +127,7 @@ class Subscriber(object):
         uni_mail = cls.format_mail(mail=mail)
 
         if not uni_mail:
-            return
+            return None
 
         data = SubscriberDB().find_one({'_id': uni_mail})
         if data:
@@ -135,15 +139,15 @@ class Subscriber(object):
 
             SubscriberDB().update_one({'_id': uni_mail}, _update)
             return ('update', uni_mail)
-        else:
-            insert_data = SubscriberDB.default(
-                uni_mail=uni_mail, name=name.strip(), mails=[mail, ])
 
-            SubscriberDB().insert_one(insert_data)
-            return ('new', uni_mail)
+        insert_data = SubscriberDB.default(
+            uni_mail=uni_mail, name=name.strip(), mails=[mail, ])
+
+        SubscriberDB().insert_one(insert_data)
+        return ('new', uni_mail)
 
     @staticmethod
-    def format_mail(mail):
+    def format_mail(mail: str) -> str:
         '''format mail
 
            clean '.', '+', lower
@@ -155,22 +159,25 @@ class Subscriber(object):
         _mail = mail.split('@')
 
         if '.' in _mail[0]:
-            return '%s@%s' % (_mail[0].replace('.', ''), _mail[1])
+            return f"{_mail[0].replace('.', '')}@{_mail[1]}"
 
         return mail
 
     @staticmethod
-    def shadata(data):
-        m = hashlib.sha256()
-        m.update(data.encode('utf8'))
+    def shadata(data: str) -> str:
+        ''' sha data '''
+        msg = hashlib.sha256()
+        msg.update(data.encode('utf8'))
 
-        return m.hexdigest()
+        return msg.hexdigest()
 
 
-class SubscriberRead(object):
+class SubscriberRead():
     ''' SubscriberRead object '''
+    # pylint: disable=too-few-public-methods
     @staticmethod
-    def add(ucode, topic, headers, args=None):
+    def add(ucode: str, topic: str,
+            headers: dict[str, Any], args: Optional[str] = None) -> None:
         ''' add record
 
         :param str ucode: ucode
@@ -191,16 +198,29 @@ class SubscriberRead(object):
 
 class GenLists:
     ''' GenLists '''
+    # pylint: disable=too-few-public-methods
     @staticmethod
-    def dumps(request_args, need_id=False):
+    def dumps(request_args: dict[str, Any],
+              need_id: bool = False) -> Generator[Mapping[
+                  Literal['name', 'mail', 'status', 'verified_email',
+                          'admin_link', 'ucode', 'args', 'openhash'] |
+                  Literal['_id',
+                          'name', 'mail', 'status', 'verified_email',
+                          'admin_link', 'ucode', 'args', 'openhash'], Any], None, None]:
         ''' dumps '''
         has_open_hash = False
+        row: Mapping[Literal['name', 'mail', 'status', 'verified_email',
+                             'admin_link', 'ucode', 'args', 'openhash'] |
+                     Literal['_id',
+                             'name', 'mail', 'status', 'verified_email',
+                             'admin_link', 'ucode', 'args', 'openhash'], Any]
         if 't' in request_args and request_args['t']:
             has_open_hash = True
 
             for data in SubscriberDB().find({'status': True}, {'_id': 1}):
                 user = Subscriber(mail=data['_id'])
-                # ('name', 'mail', 'status', 'verified_email', 'admin_link', 'ucode', 'args', 'openhash')
+                # ('name', 'mail', 'status', 'verified_email',
+                #  'admin_link', 'ucode', 'args', 'openhash')
                 row = {
                     'name': user.data['name'],
                     'mail': user.data['mails'][-1],

@@ -1,9 +1,13 @@
+''' subscribe '''
+import json
 import logging
 from datetime import datetime
 
 import requests
 from flask import (Blueprint, jsonify, redirect, render_template, request,
                    session, url_for)
+from flask.wrappers import Response
+from werkzeug.wrappers import Response as ResponseBase
 
 import setting
 from celery_task.task_ga import ga_subscribe
@@ -14,7 +18,7 @@ from module.subscriber import Subscriber
 VIEW_SUBSCRIBE = Blueprint('subscribe', __name__, url_prefix='/subscribe')
 
 
-def process_subscribe(mail, name):
+def process_subscribe(mail: str, name: str) -> Subscriber:
     ''' Process subscribe '''
     user = Subscriber(mail=mail)
     Subscriber.process_upload(mail=mail, name=name)
@@ -33,10 +37,11 @@ def process_subscribe(mail, name):
 
 
 @VIEW_SUBSCRIBE.route('/coscup/opass', methods=('POST', ))
-def coscup_opass():
+def coscup_opass() -> str | ResponseBase:
     ''' subscribe coscup via opass'''
     if request.method == 'POST':
         resp = requests.post('https://hcaptcha.com/siteverify',
+                             timeout=10,
                              data={'response': request.form['h-captcha-response'],
                                    'secret': setting.HCAPTCHA_TOKEN,
                                    'remoteip': request.headers.get('X-REAL-IP')}).json()
@@ -44,13 +49,18 @@ def coscup_opass():
         logging.info('[opass] hcaptcha: %s', resp)
 
         if not resp['success']:
-            return jsonify({'error-codes': resp.get('error-codes')}), 400
+            return Response(
+                response=json.dumps({'error-codes': resp.get('error-codes')}),
+                status=400,
+                mimetype='application/json',
+            )
 
         if not 'onlytoken' in request.form:
             process_subscribe(
                 mail=request.form['mail'].strip(), name=request.form['name'].strip())
 
         opass_resp = requests.post('https://ccip.opass.app/import',
+                                   timeout=10,
                                    data={'name': request.form['name'].strip()}
                                    ).json()
 
@@ -76,7 +86,7 @@ def coscup_opass():
 
 
 @VIEW_SUBSCRIBE.route('/coscup', methods=('GET', 'POST'))
-def coscup():
+def coscup() -> str | ResponseBase:
     ''' subscribe coscup '''
     if request.method == 'GET':
         user_count = SubscriberDB().count_documents({'status': True})
@@ -89,6 +99,7 @@ def coscup():
             return redirect(url_for('subscriber.info_msg', _scheme='https', _external=True))
 
         resp = requests.post('https://hcaptcha.com/siteverify',
+                             timeout=10,
                              data={'response': request.form['h-captcha-response'],
                                    'secret': setting.HCAPTCHA_TOKEN,
                                    'remoteip': request.headers.get('X-REAL-IP')}).json()
