@@ -61,16 +61,21 @@
                     </div>
                     <div class="field has-addons">
                         <div class="control">
+                            <a class="button is-outlined is-info" v-on:click="add">
+                                <span class="icon"><i class="fas fa-at"></i></span>
+                                <span>{{user_count}} <strong>+[[ userCount ]]</strong> subscribers</span>
+                            </a>
+                        </div>
+                        <div class="control">
                             <button class="button is-outlined is-dark">
                                 <span class="icon"><i class="far fa-paper-plane"></i></span>
                                 <span>訂閱 / Subscribe</span>
                             </button>
                         </div>
+                    </div>
+                    <div class="field has-background-info-light px-3 py-3">
                         <div class="control">
-                            <a class="button is-outlined is-info" v-on:click="add">
-                                <span class="icon"><i class="fas fa-at"></i></span>
-                                <span>{{user_count}} <strong>+[[ userCount ]]</strong> subscribers</span>
-                            </a>
+                            在 COSCUP 2023 有一個議題是「<a target="_blank" href="https://volunteer.coscup.org/schedule/2023/talks/f4231/%E7%B6%9C%E5%90%88%E8%AD%B0%E7%A8%8B%E2%80%94%E5%85%B6%E4%BB%96%E9%96%8B%E6%BA%90%E8%AD%B0%E9%A1%8C#AWCXJK">如何實作一個電子報訂閱與發送系統 — 以 COSCUP 電子報訂閱為例</a>」，歡迎前往聆聽與交流！
                         </div>
                     </div>
                 </form>
