@@ -13,7 +13,7 @@ from models.subscriberdb import (SubscriberDB, SubscriberLoginTokenDB,
 from module.utils import hmac_encode
 
 
-class Subscriber():
+class Subscriber:
     '''Subscriber class
 
     :param str mail: get subscriber data from mail
@@ -172,7 +172,7 @@ class Subscriber():
         return msg.hexdigest()
 
 
-class SubscriberRead():
+class SubscriberRead:
     ''' SubscriberRead object '''
     # pylint: disable=too-few-public-methods
     @staticmethod

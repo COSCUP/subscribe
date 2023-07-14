@@ -17,7 +17,7 @@ from typing import Any
 import boto3  # type:ignore
 
 
-class AWSS3():
+class AWSS3:
     ''' AWSS3
 
     :param str aws_access_key_id: aws_access_key_id
@@ -62,7 +62,7 @@ class AWSS3():
         return attachment
 
 
-class AWSSES():
+class AWSSES:
     ''' AWSSES
 
     :param str aws_access_key_id: aws_access_key_id

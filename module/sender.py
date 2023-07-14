@@ -7,7 +7,7 @@ import setting
 from module.awsses import AWSSES
 
 
-class SenderMailer():
+class SenderMailer:
     ''' Sender Mailer
     :param str template_path: template path
     :param str subject: subject
