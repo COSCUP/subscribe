@@ -1,4 +1,4 @@
-FROM secretaryweb-base:23.06.25
+FROM secretaryweb-base:23.09.01
 
 ADD ./client_secret.json ./client_secret.json
 ADD ./main.py ./main.py
