@@ -35,7 +35,8 @@ ADD ./templates/admin_subscriber_add.html \
     ./templates/admin_subscriber_open.html \
     ./templates/admin_subscriber.html \
     ./templates/base_subscribe.html \
-    ./templates/base.html templates/index.html \
+    ./templates/base.html \
+    ./templates/index.html \
     ./templates/subscribe_coscup.html \
     ./templates/subscriber_error.html \
     ./templates/subscriber_intro.html \
