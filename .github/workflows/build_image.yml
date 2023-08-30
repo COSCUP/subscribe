@@ -1,0 +1,30 @@
+name: BuildImages
+
+on:
+  push:
+    paths:
+      - "Dockerfile-**"
+      - ".github/workflows/build_image.yml"
+  workflow_dispatch:
+
+jobs:
+  docker-dev:
+    strategy:
+      matrix:
+        os: ["ubuntu-20.04", "ubuntu-22.04"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build the base image
+        run: docker build -t secretaryweb-base:23.09.01 -f ./Dockerfile-base ./
+      - name: List images
+        run: docker images
+      - name: Rename sample setting file
+        run: mv ./setting_sample.py ./setting.py
+      - name: Add fake client secret
+        run: touch ./client_secret.json
+      - name: Build app
+        run: docker build --no-cache=true -t secretary-app:prod -f ./Dockerfile-app ./
+      - name: List images
+        run: docker images

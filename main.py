@@ -3,6 +3,7 @@ import hashlib
 import logging
 import os
 import traceback
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 import arrow
@@ -10,6 +11,8 @@ import google_auth_oauthlib.flow
 from apiclient import discovery
 from flask import (Flask, g, got_request_exception, redirect, render_template,
                    request, session, url_for)
+from flask.wrappers import Response
+from werkzeug.wrappers import Response as ResponseBase
 
 import setting
 from celery_task.task_mail_sys import mail_sys_weberror
@@ -24,9 +27,6 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)-5.5s][%(thread)6.6s] [%(module)s:%(funcName)s#%(lineno)d]: %(message)s',  # pylint: disable=line-too-long
     datefmt='%Y-%m-%d %H:%M:%S',
     level=logging.DEBUG)
-
-#import re
-
 
 app = Flask(__name__)
 app.config['SESSION_COOKIE_NAME'] = '__Host-ss'
@@ -49,7 +49,7 @@ NO_NEED_LOGIN_PATH = (
 
 
 @app.before_request
-def need_login():
+def need_login() -> ResponseBase | None:
     ''' need_login '''
     logging.info('[X-SSL-SESSION-ID: %s] [X-REAL-IP: %s] [USER-AGENT: %s] [SESSION: %s]',
                  request.headers.get('X-SSL-SESSION-ID'),
@@ -70,7 +70,7 @@ def need_login():
 
 
 @app.after_request
-def cors_header(response):
+def cors_header(response: Response) -> Response:
     ''' CORS setting '''
     response.headers.add('Access-Control-Allow-Credentials', 'true')
 
@@ -86,7 +86,7 @@ def cors_header(response):
 
 
 @app.after_request
-def no_store(response):
+def no_store(response: Response) -> Response:
     ''' return no-store '''
     if session.get('u'):
         response.headers['Cache-Control'] = 'no-store'
@@ -95,13 +95,13 @@ def no_store(response):
 
 
 @app.route('/')
-def index():
+def index() -> str:
     ''' index '''
     return render_template('./index.html')
 
 
 @app.route('/oauth2callback')
-def oauth2callback():
+def oauth2callback() -> ResponseBase:
     ''' oauth2callback '''
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         setting.CLIENT_SECRET,
@@ -151,7 +151,7 @@ def oauth2callback():
 
 
 @app.route('/logout')
-def oauth2logout():
+def oauth2logout() -> ResponseBase:
     ''' Logout
 
         **GET** ``/logout``
@@ -167,27 +167,28 @@ def oauth2logout():
 
 
 @app.route('/exception')
-def exception_func():
+def exception_func() -> str:
     ''' exception_func '''
     try:
-        1/0
+        return str(1/0)
     except ZeroDivisionError as error:
-        raise ZeroDivisionError('Error: [%s]', error)
+        raise ZeroDivisionError(f'Error: [{error}]') from error
 
 
-def error_exception(sender, exception, **extra):
+def error_exception(sender: Any, exception: Any, **extra: Any) -> None:
     ''' error_exception '''
     logging.debug('sender: %s, exception: %s, extra: %s',
                   sender, exception, extra)
     mail_sys_weberror.apply_async(
         kwargs={
-            'title': '%s %s %s' % (request.method, request.path, arrow.now()),
-            'body': '''<b>%s</b> %s<br>
-            <pre>%s</pre>
-            <pre>%s</pre>
-            <pre>User: %s\n\nsid: %s\n\nargs: %s\n\nform: %s\n\nvalues: %s\n\n%s</pre>''' %
-            (request.method, request.path, os.environ, request.headers,
-             g.get('user', {}).get('account', {}).get('_id'), session.get('sid'), request.args, request.form, request.values, traceback.format_exc())
+            'title': f'{request.method}, {request.path}, {arrow.now()}',
+            'body': f'''<b>{request.method}</b> {request.path}<br>
+<pre>{os.environ}</pre>
+<pre>{request.headers}</pre>
+<pre>User: {g.get('user', {}).get('account', {}).get('_id')}\n\n
+sid: {session.get('sid')}\n\n
+args: {request.args}\n\nform: {request.form}\n\n
+values: {request.values}\n\n{traceback.format_exc()}</pre>'''
         })
 
 

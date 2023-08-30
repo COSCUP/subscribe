@@ -1,3 +1,4 @@
+''' index '''
 from models.subscriberdb import (SubscriberDB, SubscriberLoginTokenDB,
                                  SubscriberReadDB)
 

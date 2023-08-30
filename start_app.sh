@@ -7,7 +7,7 @@ docker run -d --restart='always' \
            -v $(pwd)/log:/app/log \
            -p 127.0.0.1:5999:5000 \
            -e LD_PRELOAD=/usr/local/lib/libjemalloc.so \
-           secretary-app:prod uwsgi ./uwsgi.ini
+           secretary-app:prod poetry run uwsgi ./uwsgi.ini
 
 docker run -d --restart='always' \
            --name secretary-2 \
@@ -18,4 +18,4 @@ docker run -d --restart='always' \
            -v $(pwd)/log:/app/log \
            -p 127.0.0.1:5998:5000 \
            -e LD_PRELOAD=/usr/local/lib/libjemalloc.so \
-           secretary-app:prod uwsgi ./uwsgi.ini
+           secretary-app:prod poetry run uwsgi ./uwsgi.ini
