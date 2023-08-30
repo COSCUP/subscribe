@@ -177,7 +177,9 @@ class AWSSES:
             return self.client.send_raw_email(
                 RawMessage={'Data': kwargs['data_str']})
 
-        data = kwargs.get('data', self.raw_mail(**kwargs))
+        data = kwargs.get('data')
+        if data is None:
+            data = self.raw_mail(**kwargs)
 
         return self.client.send_raw_email(
             RawMessage={'Data': data.as_string()})
