@@ -4,6 +4,7 @@ services:
       context: ./nginx
     ports:
       - 80:80
+      - 443:443
     volumes:
       - $PWD/nginx/sites:/etc/nginx/sites-available
       # Uncomment the next line to add your ssl certificate and key to Nginx
