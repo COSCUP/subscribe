@@ -39,6 +39,9 @@ app.register_blueprint(VIEW_SUBSCRIBE)
 app.register_blueprint(VIEW_SUBSCRIBER)
 app.register_blueprint(VIEW_TRELLO)
 
+if app.debug:
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 
 NO_NEED_LOGIN_PATH = (
     '/',

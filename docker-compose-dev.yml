@@ -1,0 +1,142 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - $PWD/nginx/sites:/etc/nginx/sites-available
+      # Uncomment the next line to add your ssl certificate and key to Nginx
+      # - /path/to/your/certificate_and_key:/etc/nginx/ssl
+    depends_on:
+      - web
+    networks:
+      - backend
+
+  web:
+    image: "secretaryweb-base:${VERSION}"
+    links:
+      - secretary_mongo:mongo
+      - queue_sender:rabbitmq
+    volumes:
+      - $PWD/celery_task:/app/celery_task:delegated
+      - $PWD/models:/app/models:delegated
+      - $PWD/module:/app/module:delegated
+      - $PWD/templates:/app/templates:delegated
+      - $PWD/view:/app/view:delegated
+      - $PWD/log:/app/log:cached
+      - $PWD/client_secret.json:/app/client_secret.json:delegated
+      - $PWD/setting.py:/app/setting.py:delegated
+      - $PWD/main.py:/app/main.py:delegated
+    depends_on:
+      - queue_sender
+      - secretary_mongo
+    ports:
+      - 5000:5000
+      - 5678:5678
+    networks:
+      - backend
+    entrypoint: [
+      "poetry",
+      "run",
+      "flask",
+      "--app",
+      "main:app",
+      "run",
+      "--host",
+      "0.0.0.0",
+      "--debug"
+    ]
+    
+  celery_worker:
+    image: "secretaryweb-base:${VERSION}"
+    links:
+      - secretary_mongo:mongo
+      - queue_sender:rabbitmq
+    volumes:
+      - $PWD/celery_task:/app/celery_task:delegated
+      - $PWD/models:/app/models:delegated
+      - $PWD/module:/app/module:delegated
+      - $PWD/log_docker_celery:/app/log_docker_celery:cached
+      - $PWD/templates:/app/templates:delegated
+      - $PWD/setting.py:/app/setting.py:delegated
+      - $PWD/main.py:/app/main.py:delegated
+    depends_on:
+      - queue_sender
+      - secretary_mongo
+    environment:
+      - C_FORCE_ROOT=true
+    networks:
+      - backend
+    entrypoint: [
+      "poetry",
+      "run",
+      "celery",
+      "-A",
+      "celery_task", 
+      "worker", 
+      "-B",
+      "-l",
+      "info",
+      "-O",
+      "fair",
+      "-c",
+      "4",
+      "--logfile",
+      "./log_docker_celery/log.log"
+    ]
+  
+  worker:
+    image: "secretaryweb-base:${VERSION}"
+    links:
+      - secretary_mongo:mongo
+      - queue_sender:rabbitmq
+    volumes:
+      - $PWD/celery_task:/app/celery_task:delegated
+      - $PWD/models:/app/models:delegated
+      - $PWD/module:/app/module:delegated
+      - $PWD/templates:/app/templates:delegated
+      - $PWD/view:/app/view:delegated
+      - $PWD/log:/app/log:cached
+      - $PWD/log_docker_celery:/app/log_docker_celery:cached
+      - $PWD/setting.py:/app/setting.py:delegated
+      - $PWD/main.py:/app/main.py:delegated
+    depends_on:
+      - queue_sender
+      - secretary_mongo
+    networks:
+      - backend
+    environment:
+      - PYTHONPATH=/app
+    command: sh
+
+  secretary_mongo:
+    image: "mongo:6.0.6-jammy"
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodata:/data
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    networks:
+      - backend
+
+  queue_sender:
+    image: "rabbitmq:3.11.18-management-alpine"
+    depends_on:
+      - secretary_mongo
+    networks:
+      - backend
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mongodata: {}
+  mongodb: {}
+  mongoconfig: {}
+  rabbitdata: {}
