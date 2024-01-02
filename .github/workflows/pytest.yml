@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-20.04", "ubuntu-22.04"]
-        python-version: ["3.11"]
+        python-version: ["3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -36,7 +36,7 @@ jobs:
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.6.1
+          version: 1.7.1
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
