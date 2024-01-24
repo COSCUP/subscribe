@@ -1,26 +1,19 @@
 {
-    "python.analysis.typeCheckingMode": "basic",
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "python.testing.pytestArgs": [
-        "-vv",
-        "--cov-report=term-missing",
-        "--cov"
-    ],
-    "git.alwaysSignOff": true,
-    "python.testing.cwd": "${workspaceFolder}",
-    "python.envFile": "${workspaceFolder}/.env",
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": true
-        },
-    },
-    "isort.args": [
-        "--src=${workspaceFolder}",
-        "--line-length=100",
-    ],
-    "isort.check": true
+  "python.analysis.typeCheckingMode": "basic",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["-vv", "--cov-report=term-missing", "--cov"],
+  "git.alwaysSignOff": true,
+  "python.testing.cwd": "${workspaceFolder}",
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "isort.args": ["--src=${workspaceFolder}", "--line-length=100"],
+  "isort.check": true
 }
