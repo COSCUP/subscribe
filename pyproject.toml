@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "coscupsecretary2020"
-version = "23.07.01"
+version = "24.01.25"
 description = ""
 authors = ["Toomore Chiang <toomore0929@gmail.com>"]
 license = "AGPL-3.0"
